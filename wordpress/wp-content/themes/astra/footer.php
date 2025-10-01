@@ -138,11 +138,6 @@ section .section-title {
 	-moz-transition: .3s all ease;
 	transition: .3s all ease;
 }
-#footer h5:hover{
-	color: #eeeeee;
-	transform: translateX(5px);
-	font-weight: bold;
-}
 
 /* Hover effect for social media icons */
 #footer ul.social li a{
