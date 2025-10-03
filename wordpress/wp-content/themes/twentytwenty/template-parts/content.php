@@ -1,94 +1,307 @@
 <?php
 /**
- * The default template for displaying content
- *
- * Used for both singular and index.
- *
- * @link https://developer.wordpress.org/themes/basics/template-hierarchy/
- *
- * @package WordPress
- * @subpackage Twenty_Twenty
- * @since Twenty Twenty 1.0
+ * Template hiển thị bài viết với giao diện mới
  */
-
+$class = '';
+if(!is_single()){
+    $class = 'danh-sach';
+}
 ?>
 
-<article <?php post_class(); ?> id="post-<?php the_ID(); ?>">
+<style>
+.post-item-horizontal {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 30px;
+    padding: 25px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
 
-	<?php
+.post-item-horizontal:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    border-color: #d0d0d0;
+}
 
-	get_template_part( 'template-parts/entry-header' );
+.post-thumbnail-wrapper {
+    flex: 0 0 480px;
+    position: relative;
+}
 
-	if ( ! is_search() ) {
-		get_template_part( 'template-parts/featured-image' );
-	}
+.post-thumbnail-wrapper img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 8px;
+}
 
-	?>
+.post-content-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
 
-	<div class="post-inner <?php echo is_page_template( 'templates/template-full-width.php' ) ? '' : 'thin'; ?> ">
+/* Phần trên - Header */
+.post-header-section {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    flex: 1;
+    margin-bottom: 20px;
+}
 
-		<div class="entry-content">
+.post-date-badge {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-shrink: 0;
+    padding: 15px 20px;
+    border: 2px solid #003DA5;
+    border-radius: 8px;
+    background: #fff;
+}
 
-			<?php
-			if ( is_search() || ! is_singular() && 'summary' === get_theme_mod( 'blog_content', 'full' ) ) {
-				the_excerpt();
-			} else {
-				the_content( __( 'Continue reading', 'twentytwenty' ) );
-			}
-			?>
+.date-number {
+    font-size: 72px;
+    font-weight: 700;
+    color: #003DA5;
+    line-height: 1;
+}
 
-		</div><!-- .entry-content -->
+.date-text {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    color: #666;
+    text-transform: uppercase;
+}
 
-	</div><!-- .post-inner -->
+.date-month {
+    font-weight: 600;
+}
 
-	<div class="section-inner">
-		<?php
-		wp_link_pages(
-			array(
-				'before'      => '<nav class="post-nav-links bg-light-background" aria-label="' . esc_attr__( 'Page', 'twentytwenty' ) . '"><span class="label">' . __( 'Pages:', 'twentytwenty' ) . '</span>',
-				'after'       => '</nav>',
-				'link_before' => '<span class="page-number">',
-				'link_after'  => '</span>',
-			)
-		);
+.post-title-category-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 
-		edit_post_link();
+.post-title-link {
+    text-decoration: none;
+    color: #000;
+}
 
-		// Single bottom post meta.
-		twentytwenty_the_post_meta( get_the_ID(), 'single-bottom' );
+.post-title-link:hover .post-title {
+    color: #003DA5;
+}
 
-		if ( post_type_supports( get_post_type( get_the_ID() ), 'author' ) && is_single() ) {
+.post-title {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin: 0;
+    color: #000;
+    transition: color 0.3s ease;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
-			get_template_part( 'template-parts/entry-author-bio' );
+.post-category {
+    display: inline-block;
+    padding: 5px 15px;
+    background: #f0f0f0;
+    border-radius: 20px;
+    font-size: 13px;
+    color: #666;
+    text-decoration: none;
+    align-self: flex-start;
+}
 
-		}
-		?>
+.post-category:hover {
+    background: #e0e0e0;
+}
 
-	</div><!-- .section-inner -->
+/* Phần dưới - Mô tả */
+.post-description-section {
+    flex: 1;
+}
 
-	<?php
+.post-excerpt {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #333;
+    margin: 0;
+}
 
-	if ( is_single() ) {
+@media (max-width: 992px) {
+    .post-item-horizontal {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .post-thumbnail-wrapper {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+    
+    .post-header-section {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .date-number {
+        font-size: 60px;
+    }
+    
+    .post-title {
+        font-size: 24px;
+    }
+}
 
-		get_template_part( 'template-parts/navigation' );
+@media (max-width: 576px) {
+    .date-number {
+        font-size: 48px;
+    }
+    
+    .post-title {
+        font-size: 20px;
+    }
+    
+    .post-thumbnail-wrapper img {
+        height: 200px;
+    }
+    
+    .post-date-badge {
+        padding: 10px 15px;
+    }
+}
+</style>
 
-	}
-
-	/*
-	 * Output comments wrapper if it's a post, or if comments are open,
-	 * or if there's a comment number – and check for password.
-	 */
-	if ( ( is_single() || is_page() ) && ( comments_open() || get_comments_number() ) && ! post_password_required() ) {
-		?>
-
-		<div class="comments-wrapper section-inner">
-
-			<?php comments_template(); ?>
-
-		</div><!-- .comments-wrapper -->
-
-		<?php
-	}
-	?>
-
+<article <?php post_class($class); ?> id="post-<?php the_ID(); ?>">
+    <?php if (!is_single()): ?>
+        <!-- Hiển thị dạng danh sách -->
+        <div class="post-item-horizontal">
+            <!-- Thumbnail -->
+            <div class="post-thumbnail-wrapper">
+                <?php if (has_post_thumbnail()): ?>
+                    <a href="<?php the_permalink(); ?>">
+                        <?php the_post_thumbnail('large'); ?>
+                    </a>
+                <?php else: ?>
+                    <a href="<?php the_permalink(); ?>">
+                        <img src="https://via.placeholder.com/480x300" alt="<?php the_title(); ?>">
+                    </a>
+                <?php endif; ?>
+            </div>
+            
+            <!-- Nội dung -->
+            <div class="post-content-wrapper">
+                <!-- PHẦN TRÊN: Ngày tháng, Tiêu đề, Categories -->
+                <div class="post-header-section">
+                    <!-- Ngày tháng với khung -->
+                    <div class="post-date-badge">
+                        <span class="date-number"><?php echo get_the_date('d'); ?></span>
+                        <div class="date-text">
+                            <span class="date-month">Tháng <?php echo get_the_date('n'); ?></span>
+                            <span class="date-year"><?php echo get_the_date('Y'); ?></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Tiêu đề và Categories -->
+                    <div class="post-title-category-wrapper">
+                        <a href="<?php the_permalink(); ?>" class="post-title-link">
+                            <h2 class="post-title"><?php the_title(); ?></h2>
+                        </a>
+                        
+                        <!-- Danh mục -->
+                        <?php
+                        $categories = get_the_category();
+                        if (!empty($categories)):
+                            ?>
+                            <a href="<?php echo esc_url(get_category_link($categories[0]->term_id)); ?>" class="post-category">
+                                Categories <?php echo esc_html($categories[0]->name); ?>
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                
+                <!-- PHẦN DƯỚI: Mô tả -->
+                <div class="post-description-section">
+                    <div class="post-excerpt">
+                        <?php 
+                        if (has_excerpt()) {
+                            echo wp_trim_words(get_the_excerpt(), 30, '...');
+                        } else {
+                            echo wp_trim_words(get_the_content(), 30, '...');
+                        }
+                        ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    <?php else: ?>
+        <!-- Hiển thị bài viết đơn -->
+        <?php
+        get_template_part('template-parts/entry-header');
+        if (!is_search()) {
+            get_template_part('template-parts/featured-image');
+        }
+        ?>
+        
+        <div class="post-inner <?php echo is_page_template('templates/template-full-width.php') ? '' : 'thin'; ?>">
+            <div class="entry-content">
+                <?php
+                the_content(__('Continue reading', 'twentytwenty'));
+                ?>
+            </div><!-- .entry-content -->
+        </div><!-- .post-inner -->
+        
+        <div class="section-inner">
+            <?php
+            wp_link_pages(
+                array(
+                    'before'      => '<nav class="post-nav-links bg-light-background" aria-label="' . esc_attr__('Page', 'twentytwenty') . '"><span class="label">' . __('Pages:', 'twentytwenty') . '</span>',
+                    'after'       => '</nav>',
+                    'link_before' => '<span class="page-number">',
+                    'link_after'  => '</span>',
+                )
+            );
+            
+            edit_post_link();
+            
+            // Single bottom post meta
+            twentytwenty_the_post_meta(get_the_ID(), 'single-bottom');
+            
+            if (post_type_supports(get_post_type(get_the_ID()), 'author') && is_single()) {
+                get_template_part('template-parts/entry-author-bio');
+            }
+            ?>
+        </div><!-- .section-inner -->
+        
+        <?php
+        if (is_single()) {
+            get_template_part('template-parts/navigation');
+        }
+        
+        /**
+         * Output comments wrapper if it's a post, or if comments are open,
+         * or if there's a comment number – and check for password.
+         */
+        if ((is_single() || is_page()) && (comments_open() || get_comments_number()) && !post_password_required()) {
+            ?>
+            <div class="comments-wrapper section-inner">
+                <?php comments_template(); ?>
+            </div><!-- .comments-wrapper -->
+            <?php
+        }
+        ?>
+    <?php endif; ?>
 </article><!-- .post -->

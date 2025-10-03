@@ -84,20 +84,15 @@ if ( $has_footer_menu || $has_social_menu || $has_sidebar_1 || $has_sidebar_2 ) 
 
 			<?php } ?>
 
-			<?php if ( $has_sidebar_1 || $has_sidebar_2 ) { ?>
-
+			<?php if ( $has_sidebar_1 || $has_sidebar_2 || $has_sidebar_3 ) { ?>
 				<aside class="footer-widgets-outer-wrapper">
-
 					<div class="footer-widgets-wrapper">
-
 						<?php if ( $has_sidebar_1 ) { ?>
-
 							<div class="footer-widgets column-one grid-item">
 								<?php dynamic_sidebar( 'sidebar-1' ); ?>
 							</div>
-
 						<?php } ?>
-
+						
 						<?php if ( $has_sidebar_2 ) { ?>
 
 							<div class="footer-widgets column-two grid-item">
@@ -105,6 +100,8 @@ if ( $has_footer_menu || $has_social_menu || $has_sidebar_1 || $has_sidebar_2 ) 
 							</div>
 
 						<?php } ?>
+
+						
 
 					</div><!-- .footer-widgets-wrapper -->
 

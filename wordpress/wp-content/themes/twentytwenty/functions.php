@@ -210,6 +210,9 @@ function twentytwenty_register_styles() {
 
 	// Add print CSS.
 	wp_enqueue_style( 'twentytwenty-print-style', get_template_directory_uri() . '/print.css', null, $theme_version, 'print' );
+	
+	// Add post card layout CSS.
+	wp_enqueue_style( 'twentytwenty-post-card-style', get_template_directory_uri() . '/assets/css/post-card-layout.css', array( 'twentytwenty-style' ), $theme_version );
 }
 
 add_action( 'wp_enqueue_scripts', 'twentytwenty_register_styles' );
@@ -420,9 +423,97 @@ function twentytwenty_sidebar_registration() {
 			)
 		)
 	);
+
+	// Footer Widget 1 (for Astra-style footer).
+	register_sidebar(
+		array_merge(
+			$shared_args,
+			array(
+				'name'        => __( 'Footer Widget 1', 'twentytwenty' ),
+				'id'          => 'footer-widget-1',
+				'description' => __( 'Widgets in this area will be displayed in the first column of the Astra-style footer.', 'twentytwenty' ),
+			)
+		)
+	);
+
+	// Footer Widget 2 (for Astra-style footer).
+	register_sidebar(
+		array_merge(
+			$shared_args,
+			array(
+				'name'        => __( 'Footer Widget 2', 'twentytwenty' ),
+				'id'          => 'footer-widget-2',
+				'description' => __( 'Widgets in this area will be displayed in the second column of the Astra-style footer.', 'twentytwenty' ),
+			)
+		)
+	);
+
+	// Footer Widget 3 (for Astra-style footer).
+	register_sidebar(
+		array_merge(
+			$shared_args,
+			array(
+				'name'        => __( 'Footer Widget 3', 'twentytwenty' ),
+				'id'          => 'footer-widget-3',
+				'description' => __( 'Widgets in this area will be displayed in the third column of the Astra-style footer.', 'twentytwenty' ),
+			)
+		)
+	);
 }
 
 add_action( 'widgets_init', 'twentytwenty_sidebar_registration' );
+
+/**
+ * Custom function to display posts with date layout
+ */
+function twentytwenty_display_posts_with_date( $number_of_posts = 5 ) {
+	$args = array(
+		'post_type' => 'post',
+		'posts_per_page' => $number_of_posts,
+		'post_status' => 'publish',
+		'orderby' => 'date',
+		'order' => 'DESC'
+	);
+	
+	$posts = get_posts( $args );
+	
+	if ( $posts ) {
+		echo '<div class="posts-with-date">';
+		foreach ( $posts as $post ) {
+			setup_postdata( $post );
+			$post_date = get_the_date( 'j', $post->ID );
+			$post_month = get_the_date( 'M', $post->ID );
+			$post_excerpt = wp_trim_words( get_the_excerpt( $post->ID ), 20, '...' );
+			
+			echo '<div class="post-item">';
+			echo '<div class="post-date">';
+			echo '<div class="day">' . $post_date . '</div>';
+			echo '<div class="month">' . $post_month . '</div>';
+			echo '</div>';
+			echo '<div class="post-content">';
+			echo '<div class="post-title"><a href="' . get_permalink( $post->ID ) . '">' . get_the_title( $post->ID ) . '</a></div>';
+			echo '<div class="post-excerpt">' . $post_excerpt . '</div>';
+			echo '</div>';
+			echo '</div>';
+		}
+		echo '</div>';
+		wp_reset_postdata();
+	}
+}
+
+/**
+ * Shortcode to display posts with date layout
+ */
+function twentytwenty_posts_with_date_shortcode( $atts ) {
+	$atts = shortcode_atts( array(
+		'number' => 5,
+	), $atts );
+	
+	ob_start();
+	twentytwenty_display_posts_with_date( $atts['number'] );
+	return ob_get_clean();
+}
+add_shortcode( 'posts_with_date', 'twentytwenty_posts_with_date_shortcode' );
 
 /**
  * Enqueue supplemental block editor styles.
@@ -756,6 +847,33 @@ function twentytwenty_get_elements_array() {
 	// The array is formatted like this:
 	// [key-in-saved-setting][sub-key-in-setting][css-property] = [elements].
 	$elements = array(
+		'content'       => array(
+			'accent'     => array(
+				'color'            => array( '.color-accent', '.color-accent-hover:hover', '.color-accent-hover:focus', ':root .has-accent-color', '.has-drop-cap:not(:focus):first-letter', '.wp-block-button.is-style-outline', 'a' ),
+				'border-color'     => array( 'blockquote', '.border-color-accent', '.border-color-accent-hover:hover', '.border-color-accent-hover:focus' ),
+				'background-color' => array( 'button', '.button', '.faux-button', '.wp-block-button__link', '.wp-block-file .wp-block-file__button', 'input[type="button"]', 'input[type="reset"]', 'input[type="submit"]', '.bg-accent', '.bg-accent-hover:hover', '.bg-accent-hover:focus', ':root .has-accent-background-color', '.comment-reply-link' ),
+				'fill'             => array( '.fill-children-accent', '.fill-children-accent *' ),
+			),
+			'background' => array(
+				'color'            => array( ':root .has-background-color', 'button', '.button', '.faux-button', '.wp-block-button__link', '.wp-block-file__button', 'input[type="button"]', 'input[type="reset"]', 'input[type="submit"]', '.wp-block-button', '.comment-reply-link', '.has-background.has-primary-background-color:not(.has-text-color)', '.has-background.has-primary-background-color *:not(.has-text-color)', '.has-background.has-accent-background-color:not(.has-text-color)', '.has-background.has-accent-background-color *:not(.has-text-color)' ),
+				'background-color' => array( ':root .has-background-background-color' ),
+			),
+			'text'       => array(
+				'color'            => array( 'body', '.entry-title a', ':root .has-primary-color' ),
+				'background-color' => array( ':root .has-primary-background-color' ),
+			),
+			'secondary'  => array(
+				'color'            => array( 'cite', 'figcaption', '.wp-caption-text', '.post-meta', '.entry-content .wp-block-archives li', '.entry-content .wp-block-categories li', '.entry-content .wp-block-latest-posts li', '.wp-block-latest-comments__comment-date', '.wp-block-latest-posts__post-date', '.wp-block-embed figcaption', '.wp-block-image figcaption', '.wp-block-pullquote cite', '.comment-metadata', '.comment-respond .comment-notes', '.comment-respond .logged-in-as', '.pagination .dots', '.entry-content hr:not(.has-background)', 'hr.styled-separator', ':root .has-secondary-color' ),
+				'background-color' => array( ':root .has-secondary-background-color' ),
+			),
+			'borders'    => array(
+				'border-color'        => array( 'pre', 'fieldset', 'input', 'textarea', 'table', 'table *', 'hr' ),
+				'background-color'    => array( 'caption', 'code', 'code', 'kbd', 'samp', '.wp-block-table.is-style-stripes tbody tr:nth-child(odd)', ':root .has-subtle-background-background-color' ),
+				'border-bottom-color' => array( '.wp-block-table.is-style-stripes' ),
+				'border-top-color'    => array( '.wp-block-latest-posts.is-grid li' ),
+				'color'               => array( ':root .has-subtle-background-color' ),
+			),
+		),
 		'content'       => array(
 			'accent'     => array(
 				'color'            => array( '.color-accent', '.color-accent-hover:hover', '.color-accent-hover:focus', ':root .has-accent-color', '.has-drop-cap:not(:focus):first-letter', '.wp-block-button.is-style-outline', 'a' ),
