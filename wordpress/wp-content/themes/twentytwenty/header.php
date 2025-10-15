@@ -56,6 +56,19 @@
 
 					<?php } ?>
 
+					<!-- Mobile Account Toggle -->
+					<button class="toggle account-toggle mobile-account-toggle" data-toggle-target=".account-modal" data-toggle-body-class="showing-account-modal" data-set-focus=".account-modal .account-content" aria-expanded="false">
+						<span class="toggle-inner">
+							<span class="toggle-icon">
+								<svg class="account-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+									<path d="M20.59 22C20.59 18.13 16.74 15 12 15C7.26 15 3.41 18.13 3.41 22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+								</svg>
+							</span>
+							<span class="toggle-text"><?php _ex( 'Account', 'toggle text', 'twentytwenty' ); ?></span>
+						</span>
+					</button><!-- .account-toggle -->
+
 					<div class="header-titles">
 
 						<?php
@@ -162,6 +175,24 @@
 
 							<?php
 						}
+
+						// Add account toggle button
+						?>
+						<div class="toggle-wrapper account-toggle-wrapper">
+
+							<button class="toggle account-toggle desktop-account-toggle" data-toggle-target=".account-modal" data-toggle-body-class="showing-account-modal" data-set-focus=".account-modal .account-content" aria-expanded="false">
+								<span class="toggle-inner">
+									<svg class="account-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+										<path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+										<path d="M20.59 22C20.59 18.13 16.74 15 12 15C7.26 15 3.41 18.13 3.41 22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+									</svg>
+									<span class="toggle-text"><?php _ex( 'Account', 'toggle text', 'twentytwenty' ); ?></span>
+									<span class="dropdown-arrow">▼</span>
+								</span>
+							</button><!-- .account-toggle -->
+
+						</div>
+						<?php
 						?>
 
 						</div><!-- .header-toggles -->
@@ -178,6 +209,9 @@
 			if ( true === $enable_header_search ) {
 				get_template_part( 'template-parts/modal-search' );
 			}
+			
+			// Output the account modal
+			get_template_part( 'template-parts/modal-account' );
 			?>
 
 		</header><!-- #site-header -->
