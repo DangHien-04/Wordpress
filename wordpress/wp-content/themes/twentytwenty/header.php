@@ -80,7 +80,7 @@
 						?>
 
 					</div><!-- .header-titles -->
-
+					<?php get_search_form(); ?>
 					<button class="toggle nav-toggle mobile-nav-toggle" data-toggle-target=".menu-modal"  data-toggle-body-class="showing-menu-modal" aria-expanded="false" data-set-focus=".close-nav-toggle">
 						<span class="toggle-inner">
 							<span class="toggle-icon">
