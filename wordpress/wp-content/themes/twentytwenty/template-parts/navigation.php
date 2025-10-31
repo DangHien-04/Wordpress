@@ -1,61 +1,142 @@
 <?php
 /**
- * Displays the next and previous post navigation in single posts.
- *
- * @package WordPress
- * @subpackage Twenty_Twenty
- * @since Twenty Twenty 1.0
+ * Custom Post Navigation (Hiển thị ngày/tháng/năm kiểu đặc biệt, căn đẹp)
  */
 
 $next_post = get_next_post();
 $prev_post = get_previous_post();
 
-if ( $next_post || $prev_post ) {
+if ($next_post || $prev_post) :
+?>
+    <style>
+        .custom-post-navigation {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 0 10px; /* đẩy cách mép trái phải cho đẹp */
+            margin-top: 30px;
+            border: none;
+        }
 
-	$pagination_classes = '';
+        .custom-post-navigation .nav-item {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #222;
+            padding: 12px 0;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            border-radius: 6px;
+        }
 
-	if ( ! $next_post ) {
-		$pagination_classes = ' only-one only-prev';
-	} elseif ( ! $prev_post ) {
-		$pagination_classes = ' only-one only-next';
-	}
+        .custom-post-navigation .nav-item:hover {
+            background-color: #f9f9f9;
+        }
 
-	?>
+        .custom-post-navigation .date {
+            width: 70px;
+            text-align: center;
+            font-family: "Times New Roman", serif;
+            margin-right: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-	<nav class="pagination-single section-inner<?php echo esc_attr( $pagination_classes ); ?>" aria-label="<?php esc_attr_e( 'Post', 'twentytwenty' ); ?>">
+        .custom-post-navigation .day {
+            font-size: 15px;
+            line-height: 1;
+            font-weight: 500;
+        }
 
-		<hr class="styled-separator is-style-wide" aria-hidden="true" />
+        .custom-post-navigation .middle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 4px 0;
+            gap: 6px;
+        }
 
-		<div class="pagination-single-inner">
+        .custom-post-navigation .middle .line {
+            width: 26px;
+            height: 1px;
+            background-color: #000;
+            display: inline-block;
+            vertical-align: middle;
+        }
 
-			<?php
-			if ( $prev_post ) {
-				?>
+        .custom-post-navigation .middle .year {
+            font-size: 13px;
+            color: #444;
+            line-height: 1;
+            transform: translateY(1px); /* căn năm ngang hàng với thanh */
+        }
 
-				<a class="previous-post" href="<?php echo esc_url( get_permalink( $prev_post->ID ) ); ?>">
-					<span class="arrow" aria-hidden="true">&larr;</span>
-					<span class="title"><span class="title-inner"><?php echo wp_kses_post( get_the_title( $prev_post->ID ) ); ?></span></span>
-				</a>
+        .custom-post-navigation .month {
+            font-size: 13px;
+            line-height: 1;
+        }
 
-				<?php
-			}
+        .custom-post-navigation .title {
+            flex: 1;
+            font-size: 16px;
+            line-height: 1.4;
+            font-weight: 500;
+        }
 
-			if ( $next_post ) {
-				?>
+        .custom-post-navigation .nav-item:hover .title {
+            color: #0073aa;
+        }
 
-				<a class="next-post" href="<?php echo esc_url( get_permalink( $next_post->ID ) ); ?>">
-					<span class="arrow" aria-hidden="true">&rarr;</span>
-						<span class="title"><span class="title-inner"><?php echo wp_kses_post( get_the_title( $next_post->ID ) ); ?></span></span>
-				</a>
-				<?php
-			}
-			?>
+        /* Căn giữa toàn khối nếu cần */
+        @media (min-width: 768px) {
+            .custom-post-navigation {
+                max-width: 900px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+    </style>
 
-		</div><!-- .pagination-single-inner -->
+    <div class="custom-post-navigation">
 
-		<hr class="styled-separator is-style-wide" aria-hidden="true" />
+        <?php if ($prev_post) :
+            $prev_date = get_the_date('d/m/y', $prev_post->ID);
+            $prev_date_parts = explode('/', $prev_date);
+        ?>
+            <a href="<?php echo esc_url(get_permalink($prev_post->ID)); ?>" class="nav-item">
+                <div class="date">
+                    <span class="day"><?php echo esc_html($prev_date_parts[0]); ?></span>
+                    <div class="middle">
+                        <span class="line"></span>
+                        <span class="year"><?php echo esc_html($prev_date_parts[2]); ?></span>
+                    </div>
+                    <span class="month"><?php echo esc_html($prev_date_parts[1]); ?></span>
+                </div>
+                <div class="title">
+                    <?php echo esc_html(get_the_title($prev_post->ID)); ?>
+                </div>
+            </a>
+        <?php endif; ?>
 
-	</nav><!-- .pagination-single -->
+        <?php if ($next_post) :
+            $next_date = get_the_date('d/m/y', $next_post->ID);
+            $next_date_parts = explode('/', $next_date);
+        ?>
+            <a href="<?php echo esc_url(get_permalink($next_post->ID)); ?>" class="nav-item">
+                <div class="date">
+                    <span class="day"><?php echo esc_html($next_date_parts[0]); ?></span>
+                    <div class="middle">
+                        <span class="line"></span>
+                        <span class="year"><?php echo esc_html($next_date_parts[2]); ?></span>
+                    </div>
+                    <span class="month"><?php echo esc_html($next_date_parts[1]); ?></span>
+                </div>
+                <div class="title">
+                    <?php echo esc_html(get_the_title($next_post->ID)); ?>
+                </div>
+            </a>
+        <?php endif; ?>
 
-	<?php
-}
+    </div>
+<?php endif; ?>
+			
