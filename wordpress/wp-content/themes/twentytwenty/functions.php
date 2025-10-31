@@ -213,6 +213,11 @@ function twentytwenty_register_styles() {
 	
 	// Add post card layout CSS.
 	wp_enqueue_style( 'twentytwenty-post-card-style', get_template_directory_uri() . '/assets/css/post-card-layout.css', array( 'twentytwenty-style' ), $theme_version );
+	
+	// Add search results CSS for search pages.
+	if ( is_search() ) {
+		wp_enqueue_style( 'twentytwenty-search-results', get_template_directory_uri() . '/assets/css/search-results.css', array( 'twentytwenty-style' ), $theme_version );
+	}
 }
 
 add_action( 'wp_enqueue_scripts', 'twentytwenty_register_styles' );
@@ -935,3 +940,181 @@ function twentytwenty_get_elements_array() {
 	 */
 	return apply_filters( 'twentytwenty_get_elements_array', $elements );
 }
+
+/**
+ * Enqueue search results JavaScript
+ */
+function twentytwenty_search_results_scripts() {
+	if ( is_search() ) {
+		$theme_version = wp_get_theme()->get( 'Version' );
+		
+		wp_enqueue_script( 
+			'twentytwenty-search-results', 
+			get_template_directory_uri() . '/assets/js/search-results.js', 
+			array( 'jquery' ), 
+			$theme_version, 
+			true 
+		);
+		
+		// Localize script with AJAX URL and nonce
+		wp_localize_script( 'twentytwenty-search-results', 'twentytwenty_search_ajax', array(
+			'ajax_url' => admin_url( 'admin-ajax.php' ),
+			'nonce'    => wp_create_nonce( 'search_results_nonce' )
+		) );
+	}
+}
+add_action( 'wp_enqueue_scripts', 'twentytwenty_search_results_scripts' );
+
+/**
+ * AJAX Handler: Toggle post like
+ */
+function twentytwenty_toggle_post_like() {
+	check_ajax_referer( 'search_results_nonce', 'nonce' );
+	
+	$post_id = intval( $_POST['post_id'] );
+	
+	if ( ! $post_id ) {
+		wp_send_json_error( 'Invalid post ID' );
+	}
+	
+	// Get current user ID or use session/cookie for non-logged in users
+	$user_id = get_current_user_id();
+	
+	if ( $user_id ) {
+		// For logged in users, store in user meta
+		$liked_posts = get_user_meta( $user_id, 'liked_posts', true );
+		if ( ! is_array( $liked_posts ) ) {
+			$liked_posts = array();
+		}
+		
+		if ( in_array( $post_id, $liked_posts ) ) {
+			// Unlike
+			$liked_posts = array_diff( $liked_posts, array( $post_id ) );
+			$action = 'unliked';
+		} else {
+			// Like
+			$liked_posts[] = $post_id;
+			$action = 'liked';
+		}
+		
+		update_user_meta( $user_id, 'liked_posts', $liked_posts );
+	} else {
+		// For non-logged in users, use cookies
+		$cookie_name = 'liked_posts';
+		$liked_posts = isset( $_COOKIE[$cookie_name] ) ? json_decode( stripslashes( $_COOKIE[$cookie_name] ), true ) : array();
+		
+		if ( in_array( $post_id, $liked_posts ) ) {
+			$liked_posts = array_diff( $liked_posts, array( $post_id ) );
+			$action = 'unliked';
+		} else {
+			$liked_posts[] = $post_id;
+			$action = 'liked';
+		}
+		
+		setcookie( $cookie_name, json_encode( $liked_posts ), time() + ( 86400 * 30 ), '/' );
+	}
+	
+	wp_send_json_success( array( 'action' => $action ) );
+}
+add_action( 'wp_ajax_toggle_post_like', 'twentytwenty_toggle_post_like' );
+add_action( 'wp_ajax_nopriv_toggle_post_like', 'twentytwenty_toggle_post_like' );
+
+/**
+ * AJAX Handler: Increment share count
+ */
+function twentytwenty_increment_share_count() {
+	check_ajax_referer( 'search_results_nonce', 'nonce' );
+	
+	$post_id = intval( $_POST['post_id'] );
+	
+	if ( ! $post_id ) {
+		wp_send_json_error( 'Invalid post ID' );
+	}
+	
+	$share_count = get_post_meta( $post_id, 'post_share_count', true );
+	$share_count = $share_count ? intval( $share_count ) : 0;
+	$share_count++;
+	
+	update_post_meta( $post_id, 'post_share_count', $share_count );
+	
+	wp_send_json_success( array( 'share_count' => $share_count ) );
+}
+add_action( 'wp_ajax_increment_share_count', 'twentytwenty_increment_share_count' );
+add_action( 'wp_ajax_nopriv_increment_share_count', 'twentytwenty_increment_share_count' );
+
+/**
+ * AJAX Handler: Toggle post save
+ */
+function twentytwenty_toggle_post_save() {
+	check_ajax_referer( 'search_results_nonce', 'nonce' );
+	
+	$post_id = intval( $_POST['post_id'] );
+	
+	if ( ! $post_id ) {
+		wp_send_json_error( 'Invalid post ID' );
+	}
+	
+	// Get current user ID
+	$user_id = get_current_user_id();
+	
+	if ( $user_id ) {
+		// For logged in users, store in user meta
+		$saved_posts = get_user_meta( $user_id, 'saved_posts', true );
+		if ( ! is_array( $saved_posts ) ) {
+			$saved_posts = array();
+		}
+		
+		if ( in_array( $post_id, $saved_posts ) ) {
+			// Unsave
+			$saved_posts = array_diff( $saved_posts, array( $post_id ) );
+			$action = 'unsaved';
+		} else {
+			// Save
+			$saved_posts[] = $post_id;
+			$action = 'saved';
+		}
+		
+		update_user_meta( $user_id, 'saved_posts', $saved_posts );
+	} else {
+		// For non-logged in users, use cookies
+		$cookie_name = 'saved_posts';
+		$saved_posts = isset( $_COOKIE[$cookie_name] ) ? json_decode( stripslashes( $_COOKIE[$cookie_name] ), true ) : array();
+		
+		if ( in_array( $post_id, $saved_posts ) ) {
+			$saved_posts = array_diff( $saved_posts, array( $post_id ) );
+			$action = 'unsaved';
+		} else {
+			$saved_posts[] = $post_id;
+			$action = 'saved';
+		}
+		
+		setcookie( $cookie_name, json_encode( $saved_posts ), time() + ( 86400 * 30 ), '/' );
+	}
+	
+	wp_send_json_success( array( 'action' => $action ) );
+}
+add_action( 'wp_ajax_toggle_post_save', 'twentytwenty_toggle_post_save' );
+add_action( 'wp_ajax_nopriv_toggle_post_save', 'twentytwenty_toggle_post_save' );
+
+/**
+ * AJAX Handler: Track post view
+ */
+function twentytwenty_track_post_view() {
+	check_ajax_referer( 'search_results_nonce', 'nonce' );
+	
+	$post_id = intval( $_POST['post_id'] );
+	
+	if ( ! $post_id ) {
+		wp_send_json_error( 'Invalid post ID' );
+	}
+	
+	$view_count = get_post_meta( $post_id, 'post_views_count', true );
+	$view_count = $view_count ? intval( $view_count ) : 0;
+	$view_count++;
+	
+	update_post_meta( $post_id, 'post_views_count', $view_count );
+	
+	wp_send_json_success( array( 'view_count' => $view_count ) );
+}
+add_action( 'wp_ajax_track_post_view', 'twentytwenty_track_post_view' );
+add_action( 'wp_ajax_nopriv_track_post_view', 'twentytwenty_track_post_view' );
