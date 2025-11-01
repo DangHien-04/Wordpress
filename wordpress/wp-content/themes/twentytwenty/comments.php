@@ -1,9 +1,25 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>Bình luận bài viết</title>
-    <style>
+<?php
+/**
+ * The template file for displaying the comments and comment form for the
+ * Twenty Twenty theme.
+ *
+ * @package WordPress
+ * @subpackage Twenty_Twenty
+ * @since Twenty Twenty 1.0
+ */
+
+/*
+ * If the current post is protected by a password and
+ * the visitor has not yet entered the password we will
+ * return early without loading the comments.
+*/
+if ( post_password_required() ) {
+	return;
+}
+
+?>
+
+<style>
         body {
             font-family: "Segoe UI", Arial, sans-serif;
             background-color: #f8f9fa;
@@ -183,11 +199,9 @@
             line-height: 1.5;
             color: #444;
         }
-    </style>
-</head>
-<body>
+</style>
 
-<!-- Form nhập bình luận -->
+<?php if ( comments_open() || pings_open() ) : ?>
 <div class="comment-form-wrapper">
     <div class="comment-form-header"><span class="comment-form-title">Make a Post</span></div>
     <div class="comment-form-content">
@@ -217,9 +231,13 @@
         ?>
     </div>
 </div>
+<?php elseif ( is_single() ) : ?>
+    <div class="comment-respond" id="respond">
+        <p class="comments-closed"><?php _e( 'Comments are closed.', 'twentytwenty' ); ?></p>
+    </div>
+<?php endif; ?>
 
-<!-- Danh sách bình luận -->
-<?php if (have_comments()) : ?>
+<?php if ( have_comments() ) : ?>
     <ul class="comment-list">
         <?php
         wp_list_comments(array(
@@ -230,6 +248,3 @@
         ?>
     </ul>
 <?php endif; ?>
-
-</body>
-</html>
