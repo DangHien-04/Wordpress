@@ -182,6 +182,15 @@ if(!is_single()){
         padding: 10px 15px;
     }
 }
+.entry-content hr,
+.styled-separator,
+.section-inner::before,
+.section-inner::after {
+    display: none !important;
+    border: none !important;
+    height: 0 !important;
+    margin: 0 !important;
+}
 </style>
 
 <article <?php post_class($class); ?> id="post-<?php the_ID(); ?>">
