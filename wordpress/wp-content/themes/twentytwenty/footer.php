@@ -147,6 +147,33 @@
 				}
 				}
 
+				/* Footer Categories widget styles */
+				#footer .widget_categories {
+					position: relative;
+					background: #fff;
+					border: 1px solid #e0e0e0;
+					border-radius: 6px;
+					padding: 16px 20px 12px;
+					box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+					color: #333;
+				}
+				#footer .widget_categories::before{
+					content: '';
+					position: absolute;
+					left: 0; top: 0;
+					width: 100%; height: 10px;
+					background: repeating-linear-gradient(-45deg, #ededed 0, #ededed 6px, transparent 6px, transparent 12px);
+					border-radius: 6px 6px 0 0;
+				}
+				#footer .widget_categories .widget-title{ display: none; }
+				#footer .widget_categories ul{ list-style: none; margin: 10px 0 0; padding: 0; }
+				#footer .widget_categories ul li{ position: relative; padding: 12px 0 12px 18px; border-bottom: 1px solid #ebebeb; }
+				#footer .widget_categories ul li:last-child{ border-bottom: none; }
+				#footer .widget_categories ul li::before{ content:''; position:absolute; left:0; top:50%; transform:translateY(-50%); width:6px; height:6px; border-radius:50%; background:#FFC107; }
+				#footer .widget_categories ul li a{ color:#2c6db7 !important; text-decoration: none; padding-left: 0; }
+				#footer .widget_categories ul li a:hover{ text-decoration: underline; }
+				#footer .widget_categories ul li a:before{ content: none !important; }
+
 				</style>
 
 				<!-- Footer -->
