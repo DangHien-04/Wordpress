@@ -264,6 +264,82 @@ if(!is_single()){
     .single-title { font-size: 24px; }
 }
 
+/* Categories widget styles in thumbnail area */
+.post-categories-widget {
+    position: relative;
+    background: #fff !important;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 16px 20px 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    color: #333;
+    height: 300px;
+    overflow-y: auto;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.post-categories-widget::before{
+    content: '';
+    position: absolute;
+    left: 0; top: 0;
+    width: 100%; height: 10px;
+    background: repeating-linear-gradient(-45deg, #ededed 0, #ededed 6px, transparent 6px, transparent 12px);
+    border-radius: 6px 6px 0 0;
+}
+
+.post-categories-widget .widget-title{ 
+    display: block !important;
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+    color: #333;
+}
+
+.post-categories-widget ul{ 
+    list-style: none; 
+    margin: 10px 0 0; 
+    padding: 0; 
+}
+
+.post-categories-widget ul li{ 
+    position: relative; 
+    padding: 12px 0 12px 18px; 
+    border-bottom: 1px solid #ebebeb; 
+}
+
+.post-categories-widget ul li:last-child{ 
+    border-bottom: none; 
+}
+
+.post-categories-widget ul li::before{ 
+    content:''; 
+    position:absolute; 
+    left:0; 
+    top:50%; 
+    transform:translateY(-50%); 
+    width:6px; 
+    height:6px; 
+    border-radius:50%; 
+    background:#FFC107; 
+}
+
+.post-categories-widget ul li a{ 
+    color:#2c6db7 !important; 
+    text-decoration: none; 
+    padding-left: 0; 
+    font-size: 14px;
+}
+
+.post-categories-widget ul li a:hover{ 
+    text-decoration: underline; 
+}
+
+.post-categories-widget ul li a:before{ 
+    content: none !important; 
+}
+
 .entry-content hr,
 .styled-separator,
 .section-inner::before,
@@ -280,17 +356,31 @@ if(!is_single()){
     <?php if (!is_single()): ?>
         <!-- Hiển thị dạng danh sách -->
         <div class="post-item-horizontal">
-            <!-- Thumbnail -->
+            <!-- Categories Widget -->
             <div class="post-thumbnail-wrapper">
-                <?php if (has_post_thumbnail()): ?>
-                    <a href="<?php the_permalink(); ?>">
-                        <?php the_post_thumbnail('large'); ?>
-                    </a>
-                <?php else: ?>
-                    <a href="<?php the_permalink(); ?>">
-                        <img src="https://via.placeholder.com/480x300" alt="<?php the_title(); ?>">
-                    </a>
-                <?php endif; ?>
+                <div class="post-categories-widget">
+                    <h3 class="widget-title">Categories</h3>
+                    <ul>
+                        <?php
+                        $categories = get_categories(array(
+                            'orderby' => 'name',
+                            'order'   => 'ASC',
+                            'hide_empty' => false,
+                        ));
+                        
+                        if (!empty($categories)) {
+                            foreach($categories as $category) {
+                                echo '<li><a href="' . esc_url(get_category_link($category->term_id)) . '">' . esc_html($category->name) . '</a></li>';
+                            }
+                        } else {
+                            // Fallback nếu không có categories
+                            echo '<li><a href="#">Net Developer</a></li>';
+                            echo '<li><a href="#">Thực Tập Sinh Tester</a></li>';
+                            echo '<li><a href="#">Trợ giảng lập trình - Part time</a></li>';
+                        }
+                        ?>
+                    </ul>
+                </div>
             </div>
             
             <!-- Nội dung -->
@@ -340,9 +430,37 @@ if(!is_single()){
         </div>
     
     <?php else: ?>
-        <!-- Hiển thị bài viết đơn -->
-        <div class="post-inner <?php echo is_page_template('templates/template-full-width.php') ? '' : 'thin'; ?>">
-            <div class="entry-content">
+        <!-- Hiển thị bài viết đơn với categories sidebar -->
+        <div class="post-item-horizontal">
+            <!-- Categories Widget bên trái -->
+            <div class="post-thumbnail-wrapper">
+                <div class="post-categories-widget">
+                    <h3 class="widget-title">Categories</h3>
+                    <ul>
+                        <?php
+                        $categories = get_categories(array(
+                            'orderby' => 'name',
+                            'order'   => 'ASC',
+                            'hide_empty' => false,
+                        ));
+                        
+                        if (!empty($categories)) {
+                            foreach($categories as $category) {
+                                echo '<li><a href="' . esc_url(get_category_link($category->term_id)) . '">' . esc_html($category->name) . '</a></li>';
+                            }
+                        } else {
+                            // Fallback nếu không có categories
+                            echo '<li><a href="#">Net Developer</a></li>';
+                            echo '<li><a href="#">Thực Tập Sinh Tester</a></li>';
+                            echo '<li><a href="#">Trợ giảng lập trình - Part time</a></li>';
+                        }
+                        ?>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Nội dung bài viết -->
+            <div class="post-content-wrapper">
                 <div class="single-post-card">
                     <div class="single-date-badge">
                         <div class="date-grid">
@@ -361,8 +479,8 @@ if(!is_single()){
                         <?php the_content(); ?>
                     </div>
                 </div>
-            </div><!-- .entry-content -->
-        </div><!-- .post-inner -->
+            </div><!-- .post-content-wrapper -->
+        </div><!-- .post-item-horizontal -->
         
         <div class="section-inner">
             <?php
