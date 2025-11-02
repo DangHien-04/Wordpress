@@ -11,7 +11,7 @@ if(!is_single()){
 <style>
 .post-item-horizontal {
     display: flex;
-    gap: 30px;
+    gap: 20px;
     margin-bottom: 30px;
     padding: 25px;
     border: 1px solid #e0e0e0;
@@ -27,7 +27,12 @@ if(!is_single()){
 }
 
 .post-thumbnail-wrapper {
-    flex: 0 0 480px;
+    flex: 0 0 250px;
+    position: relative;
+}
+
+.post-latest-wrapper {
+    flex: 0 0 250px;
     position: relative;
 }
 
@@ -152,9 +157,19 @@ if(!is_single()){
         gap: 20px;
     }
     
-    .post-thumbnail-wrapper {
+    .post-thumbnail-wrapper,
+    .post-latest-wrapper {
         flex: 0 0 auto;
         width: 100%;
+        order: 1;
+    }
+    
+    .post-content-wrapper {
+        order: 2;
+    }
+    
+    .post-latest-wrapper {
+        order: 3;
     }
     
     .post-header-section {
@@ -346,6 +361,127 @@ if(!is_single()){
     content: none !important; 
 }
 
+/* Latest Posts widget styles */
+.post-latest-widget {
+    position: relative;
+    background: linear-gradient(135deg, #4ECDC4, #44A08D);
+    border-radius: 6px;
+    padding: 20px;
+    color: #fff;
+    height: 300px;
+    overflow-y: auto;
+}
+
+.post-latest-widget .widget-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 15px 0;
+    color: #fff;
+    text-align: center;
+}
+
+.post-latest-widget .latest-posts-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.post-latest-widget .latest-posts-list li {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+}
+
+.post-latest-widget .latest-posts-list li:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.post-latest-widget .latest-post-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    text-decoration: none;
+    color: #fff;
+}
+
+.post-latest-widget .latest-post-item:hover {
+    opacity: 0.8;
+}
+
+.post-latest-widget .date {
+    flex-shrink: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    justify-items: center;
+    width: 50px;
+    font-size: 12px;
+    font-weight: 600;
+    gap: 5px;
+}
+
+.post-latest-widget .date .left-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.post-latest-widget .date .right-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.post-latest-widget .date .day {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.post-latest-widget .date .line {
+    width: 20px;
+    height: 1px;
+    background: #fff;
+    margin: 2px 0;
+}
+
+.post-latest-widget .date .month {
+    font-size: 11px;
+}
+
+.post-latest-widget .date .year {
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.post-latest-widget .title {
+    flex: 1;
+    font-size: 13px;
+    line-height: 1.4;
+    font-weight: 500;
+}
+
+.post-latest-widget .view-all {
+    text-align: center;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+}
+
+.post-latest-widget .view-all a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.post-latest-widget .view-all a:hover {
+    text-decoration: underline;
+}
+
 .entry-content hr,
 .styled-separator,
 .section-inner::before,
@@ -419,7 +555,7 @@ if(!is_single()){
                     </div>
                 </div>
             </div>
-        </div>
+
     
     <?php else: ?>
         <!-- Hiển thị bài viết đơn với categories sidebar -->
@@ -472,6 +608,99 @@ if(!is_single()){
                     </div>
                 </div>
             </div><!-- .post-content-wrapper -->
+            
+            <!-- Latest Posts Widget bên phải -->
+            <div class="post-latest-wrapper">
+                <div class="post-latest-widget">
+                    <h3 class="widget-title">BÀI VIẾT MỚI NHẤT</h3>
+                    <ul class="latest-posts-list">
+                        <?php
+                        $latest_posts = get_posts(array(
+                            'numberposts' => 3,
+                            'post_status' => 'publish',
+                            'exclude' => array(get_the_ID())
+                        ));
+                        
+                        if (!empty($latest_posts)) {
+                            foreach($latest_posts as $latest_post) {
+                                $date_parts = explode(' ', get_the_date('d m Y', $latest_post->ID));
+                                ?>
+                                <li>
+                                    <a href="<?php echo get_permalink($latest_post->ID); ?>" class="latest-post-item">
+                                        <div class="date">
+                                            <div class="left-col">
+                                                <span class="day"><?php echo esc_html($date_parts[0]); ?></span>
+                                                <span class="line"></span>
+                                                <span class="month"><?php echo esc_html($date_parts[1]); ?></span>
+                                            </div>
+                                            <div class="right-col">
+                                                <span class="year"><?php echo esc_html(substr($date_parts[2], -2)); ?></span>
+                                            </div>
+                                        </div>
+                                        <div class="title">
+                                            <?php echo esc_html(get_the_title($latest_post->ID)); ?>
+                                        </div>
+                                    </a>
+                                </li>
+                                <?php
+                            }
+                        } else {
+                            // Fallback posts
+                            ?>
+                            <li>
+                                <a href="#" class="latest-post-item">
+                                    <div class="date">
+                                        <div class="left-col">
+                                            <span class="day">13</span>
+                                            <span class="line"></span>
+                                            <span class="month">08</span>
+                                        </div>
+                                        <div class="right-col">
+                                            <span class="year">24</span>
+                                        </div>
+                                    </div>
+                                    <div class="title">Sinh viên vượt khó, đạt thành tích nổi bật</div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="latest-post-item">
+                                    <div class="date">
+                                        <div class="left-col">
+                                            <span class="day">13</span>
+                                            <span class="line"></span>
+                                            <span class="month">08</span>
+                                        </div>
+                                        <div class="right-col">
+                                            <span class="year">24</span>
+                                        </div>
+                                    </div>
+                                    <div class="title">Livestream và chủ đề: Thiết kế đồ họa - Phác họa tương lai</div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="latest-post-item">
+                                    <div class="date">
+                                        <div class="left-col">
+                                            <span class="day">07</span>
+                                            <span class="line"></span>
+                                            <span class="month">08</span>
+                                        </div>
+                                        <div class="right-col">
+                                            <span class="year">24</span>
+                                        </div>
+                                    </div>
+                                    <div class="title">Livestream và chủ đề: Làm chủ công nghệ cùng Gen Z</div>
+                                </a>
+                            </li>
+                            <?php
+                        }
+                        ?>
+                    </ul>
+                    <div class="view-all">
+                        <a href="<?php echo home_url(); ?>">XEM TẤT CẢ TIN TỨC</a>
+                    </div>
+                </div>
+            </div>
         </div><!-- .post-item-horizontal -->
         
         <div class="section-inner">
