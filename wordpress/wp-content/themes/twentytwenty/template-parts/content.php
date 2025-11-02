@@ -31,6 +31,12 @@ if(!is_single()){
     position: relative;
 }
 
+/* List view - full width content when no sidebar */
+.post-item-horizontal .post-content-wrapper:only-child {
+    flex: 1;
+    max-width: 100%;
+}
+
 .post-thumbnail-wrapper img {
     width: 100%;
     height: 300px;
@@ -356,31 +362,17 @@ if(!is_single()){
     <?php if (!is_single()): ?>
         <!-- Hiển thị dạng danh sách -->
         <div class="post-item-horizontal">
-            <!-- Categories Widget -->
+            <!-- Thumbnail -->
             <div class="post-thumbnail-wrapper">
-                <div class="post-categories-widget">
-                    <h3 class="widget-title">Categories</h3>
-                    <ul>
-                        <?php
-                        $categories = get_categories(array(
-                            'orderby' => 'name',
-                            'order'   => 'ASC',
-                            'hide_empty' => false,
-                        ));
-                        
-                        if (!empty($categories)) {
-                            foreach($categories as $category) {
-                                echo '<li><a href="' . esc_url(get_category_link($category->term_id)) . '">' . esc_html($category->name) . '</a></li>';
-                            }
-                        } else {
-                            // Fallback nếu không có categories
-                            echo '<li><a href="#">Net Developer</a></li>';
-                            echo '<li><a href="#">Thực Tập Sinh Tester</a></li>';
-                            echo '<li><a href="#">Trợ giảng lập trình - Part time</a></li>';
-                        }
-                        ?>
-                    </ul>
-                </div>
+                <?php if (has_post_thumbnail()): ?>
+                    <a href="<?php the_permalink(); ?>">
+                        <?php the_post_thumbnail('large'); ?>
+                    </a>
+                <?php else: ?>
+                    <a href="<?php the_permalink(); ?>">
+                        <img src="https://via.placeholder.com/480x300" alt="<?php the_title(); ?>">
+                    </a>
+                <?php endif; ?>
             </div>
             
             <!-- Nội dung -->
