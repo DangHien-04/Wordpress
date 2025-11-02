@@ -182,6 +182,88 @@ if(!is_single()){
         padding: 10px 15px;
     }
 }
+
+.single-post-card {
+    position: relative;
+    padding: 30px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.single-date-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: #FFD866;
+    color: #222;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border: 4px solid #fff;
+}
+
+.single-date-badge .day {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.single-date-badge .date-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    justify-items: center;
+    width: 100%;
+    height: 100%;
+}
+.single-date-badge .col-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+.single-date-badge .col-right {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.single-date-badge .year { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.single-date-badge .month { font-size: 22px; font-weight: 700; line-height: 1; }
+
+.single-date-badge .line { width: 100%; height: 2px; background: rgba(0,0,0,0.7); display: inline-block; }
+
+.single-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 10px 0 20px;
+}
+
+.single-post-card .single-content p:first-of-type {
+    font-style: italic;
+    color: #666;
+}
+
+@media (max-width: 576px) {
+    .single-date-badge { width: 80px; height: 80px; top: 12px; right: 12px; }
+    .single-date-badge .day { font-size: 26px; margin-bottom: 4px; }
+    .single-date-badge .month { font-size: 18px; }
+    .single-date-badge .date-grid { column-gap: 6px; }
+    .single-title { font-size: 24px; }
+}
+
 .entry-content hr,
 .styled-separator,
 .section-inner::before,
@@ -194,6 +276,7 @@ if(!is_single()){
 </style>
 
 <article <?php post_class($class); ?> id="post-<?php the_ID(); ?>">
+    
     <?php if (!is_single()): ?>
         <!-- Hiển thị dạng danh sách -->
         <div class="post-item-horizontal">
@@ -258,18 +341,26 @@ if(!is_single()){
     
     <?php else: ?>
         <!-- Hiển thị bài viết đơn -->
-        <?php
-        get_template_part('template-parts/entry-header');
-        if (!is_search()) {
-            get_template_part('template-parts/featured-image');
-        }
-        ?>
-        
         <div class="post-inner <?php echo is_page_template('templates/template-full-width.php') ? '' : 'thin'; ?>">
             <div class="entry-content">
-                <?php
-                the_content(__('Continue reading', 'twentytwenty'));
-                ?>
+                <div class="single-post-card">
+                    <div class="single-date-badge">
+                        <div class="date-grid">
+                            <div class="col-left">
+                                <span class="day"><?php echo get_the_date('d'); ?></span>
+                                <span class="line"></span>
+                                <span class="month"><?php echo get_the_date('m'); ?></span>
+                            </div>
+                            <div class="col-right">
+                                <span class="year"><?php echo get_the_date('y'); ?></span>
+                            </div>
+                        </div>
+                    </div>
+                    <h1 class="single-title"><?php the_title(); ?></h1>
+                    <div class="single-content">
+                        <?php the_content(); ?>
+                    </div>
+                </div>
             </div><!-- .entry-content -->
         </div><!-- .post-inner -->
         
