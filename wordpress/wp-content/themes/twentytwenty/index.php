@@ -19,14 +19,83 @@ get_header();
 
 <main id="site-content" <?php if ( is_search() ) echo 'class="search-results-page"'; ?>>
 <style>
-	.module-13 .sidebar-title {
-    color: #1e73be !important;
-    border-bottom: 2px solid #1e73be !important;
+	/* ======================
+   Module 5 - Kết quả tìm kiếm dạng thẻ ngang
+   ====================== */
+.module-5 .search-card {
+    display: flex;
+    align-items: stretch;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+    overflow: hidden;
+    margin-bottom: 25px;
+    transition: all 0.3s ease;
 }
 
 .recent-page-title a {
     color: #000 !important;
 }
+
+/* Ảnh bên trái */
+.module-5 .search-thumb {
+    flex: 0 0 35%;
+    overflow: hidden;
+}
+.module-5 .search-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Ô ngày tháng giữa */
+.module-5 .search-date-box {
+    width: 100px;
+    background: #ffffffff;
+    text-align: center;
+    padding: 25px 10px;
+    border-right: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.module-5 .search-date-box .day {
+    font-size: 32px;
+    font-weight: 700;
+    color: #000000ff;
+    line-height: 1;
+}
+.module-5 .search-date-box .month {
+    font-size: 12px;
+    color: #555;
+    margin-top: 5px;
+}
+
+/* Nội dung bên phải */
+.module-5 .search-info {
+    flex: 1;
+    padding: 20px;
+    flex-direction: column;
+    justify-content: center;
+	text-align: left;
+}
+.module-5 .search-title a {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e73be;
+    text-align: left;		
+}
+.module-5 .search-title a:hover {
+    color: #0056a3;
+}
+.module-5 .search-excerpt {
+    color: #333;
+    margin-top: 10px;
+    line-height: 1.6;
+    font-size: 15px;
+}
+
 </style>
 	<?php
 
@@ -160,68 +229,70 @@ get_header();
 				// Reset main query after custom query
 				rewind_posts();
 				
+				// Counter for result numbering
+				global $wp_query;
+				$result_counter = $wp_query->found_posts - ( ( max( 1, get_query_var('paged') ) - 1 ) * $wp_query->query_vars['posts_per_page'] );
+				
 				while ( have_posts() ) : the_post();
 					$main_post_id   = get_the_ID();
 					$main_post_url  = get_permalink( $main_post_id );
 					$main_post_title = get_the_title( $main_post_id );
+					$post_date = get_the_date( 'd/m/Y', $main_post_id );
+					$post_day = get_the_date( 'd', $main_post_id );
+					$post_month = get_the_date( 'm', $main_post_id );
 				?>
 					
 					<article id="post-<?php echo esc_attr( $main_post_id ); ?>" <?php post_class( 'search-result-item' ); ?>>
 						
 						<!-- Module 5: Nội dung kết quả tìm kiếm -->
-						<div class="search-result-content module-5">
-							<header class="entry-header">
-								<h2 class="entry-title">
-									<a href="<?php echo esc_url( $main_post_url ); ?>"><?php echo esc_html( $main_post_title ); ?></a>
-								</h2>
-							</header><!-- .entry-header -->
+						<!-- Module 5: Giao diện kết quả tìm kiếm kiểu thẻ ngang -->
+<div class="search-result-content module-5">
+    <div class="search-card">
+        
+        <!-- Ảnh bên trái -->
+        <div class="search-thumb">
+            <a href="<?php echo esc_url( $main_post_url ); ?>">
+                <?php if ( has_post_thumbnail( $main_post_id ) ) : ?>
+                    <?php echo get_the_post_thumbnail( $main_post_id, 'medium' ); ?>
+                <?php else : ?>
+                    <img src="<?php echo get_template_directory_uri(); ?>/assets/images/default-thumbnail.jpg" alt="<?php echo esc_attr( $main_post_title ); ?>">
+                <?php endif; ?>
+            </a>
+        </div>
 
-							<div class="entry-meta">
-								<span class="post-categories">
-									<?php
-									$categories = get_the_category( $main_post_id );
-									if ( ! empty( $categories ) ) {
-										echo '<i class="category-icon"></i> ';
-										echo esc_html( $categories[0]->name );
-									}
-									?>
-								</span>
-								<span class="post-tags">
-									<?php
-									$tags = get_the_tags( $main_post_id );
-									if ( $tags ) {
-										echo '<i class="tag-icon"></i> ';
-										$tag_list = array();
-										foreach ( $tags as $tag ) {
-											$tag_list[] = $tag->name;
-										}
-										echo esc_html( implode( ', ', array_slice( $tag_list, 0, 3 ) ) );
-									}
-									?>
-								</span>
-							</div>
+        <!-- Ô ngày tháng ở giữa -->
+        <div class="search-date-box">
+            <div class="day"><?php echo get_the_date( 'd', $main_post_id ); ?></div>
+            <div class="month">THÁNG <?php echo get_the_date( 'm', $main_post_id ); ?></div>
+        </div>
 
-							<div class="entry-excerpt">
-								<?php 
-								if ( has_excerpt( $main_post_id ) ) {
-									echo get_the_excerpt( $main_post_id );
-								} else {
-									$post_content = get_post_field( 'post_content', $main_post_id );
-									echo wp_trim_words( $post_content, 30, '...' );
-								}
-								?>
-							</div>
+        <!-- Nội dung bên phải -->
+        <div class="search-info">
+            <h2 class="search-title">
+                <a href="<?php echo esc_url( $main_post_url ); ?>">
+                    <?php echo esc_html( $main_post_title ); ?>
+                </a>
+            </h2>
+            <p class="search-excerpt">
+                <?php 
+                if ( has_excerpt( $main_post_id ) ) {
+                    echo get_the_excerpt( $main_post_id );
+                } else {
+                    echo wp_trim_words( get_post_field( 'post_content', $main_post_id ), 25, '...' );
+                }
+                ?>
+            </p>
+        </div>
 
-							<div class="entry-footer">
-								<a href="<?php echo esc_url( $main_post_url ); ?>" class="read-more-link">
-									Đọc thêm &rarr;
-								</a>
-							</div>
-						</div><!-- .search-result-content -->
+    </div><!-- /.search-card -->
+</div><!-- /.module-5 -->
+
 
 					</article><!-- #post-<?php echo esc_attr( $main_post_id ); ?> -->
 
-				<?php endwhile; ?>
+				<?php 
+					$result_counter--; 
+				endwhile; ?>
 				
 				</div><!-- .search-results-list -->
 				
