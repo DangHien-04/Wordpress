@@ -18,7 +18,16 @@ get_header();
 ?>
 
 <main id="site-content" <?php if ( is_search() ) echo 'class="search-results-page"'; ?>>
+<style>
+	.module-13 .sidebar-title {
+    color: #1e73be !important;
+    border-bottom: 2px solid #1e73be !important;
+}
 
+.recent-page-title a {
+    color: #000 !important;
+}
+</style>
 	<?php
 
 	$archive_title    = '';
@@ -86,55 +95,64 @@ get_header();
 			?>
 			<div class="search-results-container section-inner">
 				
-				<!-- Module 13: 3 bài viết mới nhất - Hiển thị 1 lần duy nhất -->
-				<aside class="search-sidebar module-13">
-					<h3 class="sidebar-title">Bài viết mới nhất</h3>
-					<?php
-					// Lấy 3 bài viết mới nhất từ database
-					$recent_posts = new WP_Query( array(
-						'posts_per_page' => 3,
-						'post_status'    => 'publish',
-						'orderby'        => 'date',
-						'order'          => 'DESC',
-					) );
-					
-					if ( $recent_posts->have_posts() ) :
-					?>
-						<ul class="recent-posts-list">
-							<?php while ( $recent_posts->have_posts() ) : $recent_posts->the_post(); 
-							$post_id = get_the_ID();
-							$post_url = get_permalink( $post_id );
-						?>
-							<li class="recent-post-item">
-								<?php if ( has_post_thumbnail( $post_id ) ) : ?>
-									<div class="recent-post-thumbnail">
-										<a href="<?php echo esc_url( $post_url ); ?>">
-											<?php echo get_the_post_thumbnail( $post_id, 'thumbnail' ); ?>
-										</a>
-									</div>
-								<?php endif; ?>
-								<div class="recent-post-content">
-									<h4 class="recent-post-title">
-										<a href="<?php echo esc_url( $post_url ); ?>">
-											<?php echo wp_trim_words( get_the_title( $post_id ), 10, '...' ); ?>
-										</a>
-									</h4>
-									<div class="recent-post-meta">
-										<span class="recent-post-date">
-											<?php echo get_the_date( '', $post_id ); ?>
-										</span>
-									</div>
-								</div>
-							</li>
-						<?php endwhile; ?>
-						</ul>
-					<?php
-						wp_reset_postdata();
-					else :
-					?>
-						<p class="no-recent-posts">Không có bài viết nào.</p>
-					<?php endif; ?>
-				</aside>
+			<!-- Module 13: 3 trang mới nhất - Layout đẹp dạng thẻ -->
+<aside class="search-sidebar module-13">
+    <h3 class="sidebar-title">Trang mới nhất</h3>
+    <?php
+    $recent_posts = new WP_Query( array(
+        'post_type'      => 'page',
+        'posts_per_page' => 3,
+        'post_status'    => 'publish',
+        'orderby'        => 'date',
+        'order'          => 'DESC',
+    ) );
+
+    if ( $recent_posts->have_posts() ) :
+    ?>
+        <div class="recent-pages-grid">
+            <?php while ( $recent_posts->have_posts() ) : $recent_posts->the_post(); 
+                $post_id  = get_the_ID();
+                $post_url = get_permalink( $post_id );
+            ?>
+                <div class="recent-page-card">
+                    <h4 class="recent-page-title">
+                        <a href="<?php echo esc_url( $post_url ); ?>">
+                            <?php echo esc_html( get_the_title( $post_id ) ); ?>
+                        </a>
+                    </h4>
+
+                    <div class="recent-page-thumbnail">
+                        <a href="<?php echo esc_url( $post_url ); ?>">
+                            <?php 
+                            if ( has_post_thumbnail( $post_id ) ) {
+                                echo get_the_post_thumbnail( $post_id, 'medium' );
+                            } else {
+                                echo '<img src="' . esc_url( get_template_directory_uri() . '/assets/images/no-image.jpg' ) . '" alt="No image">';
+                            }
+                            ?>
+                        </a>
+                    </div>
+
+                    <div class="recent-page-excerpt">
+                        <?php 
+                        $page_content = get_post_field( 'post_content', $post_id );
+                        if ( ! empty( $page_content ) ) {
+                            echo wp_trim_words( strip_shortcodes( $page_content ), 20, '...' );
+                        }
+                        ?>
+                    </div>
+                </div>
+            <?php endwhile; ?>
+        </div>
+    <?php
+        wp_reset_postdata();
+    else :
+    ?>
+        <p class="no-recent-posts">Không có trang nào.</p>
+    <?php endif; ?>
+</aside>
+
+
 				
 				<div class="search-results-list">
 				
