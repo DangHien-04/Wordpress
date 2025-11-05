@@ -1,204 +1,178 @@
 <?php
-/**
- * The template file for displaying the comments and comment form for the
- * Twenty Twenty theme.
- *
- * @package WordPress
- * @subpackage Twenty_Twenty
- * @since Twenty Twenty 1.0
- */
-
-/*
- * If the current post is protected by a password and
- * the visitor has not yet entered the password we will
- * return early without loading the comments.
-*/
 if ( post_password_required() ) {
 	return;
 }
-
 ?>
 
 <style>
-        body {
-            font-family: "Segoe UI", Arial, sans-serif;
-            background-color: #f8f9fa;
-            margin: 0;
-            padding: 0px;
-        }
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0px;
+}
 
-        /* Khung tổng thể */
-        .comment-form-wrapper {
-            width: 100%;
-            max-width: 700px;
-            margin: 0 auto 40px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
-            border: 1px solid #e9e9e9;
-            overflow: visible;
-        }
+/* ===== Khung form ===== */
+.comment-form-wrapper {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto 40px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e9e9e9;
+    overflow: hidden;
+}
 
-        /* Thanh tiêu đề */
-        .comment-form-header {
-            background-color: #f7f7f8;
-            height: 52px;
-            padding: 0 18px;
-            position: relative;
-            border-bottom: 1px solid #e9e9e9;
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-        }
+.comment-form-header {
+    background-color: #f7f7f8;
+    height: 52px;
+    padding: 0 18px;
+    position: relative;
+    border-bottom: 1px solid #e9e9e9;
+    
+}
 
-        .comment-form-title {
-            position: absolute;
-            left: 20px;
-            top: 2px;
-            display: inline-block;
-            background: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
-            color: #111827;
-            font-size: 17px;
-            font-weight: 700;
-            padding: 12px 20px;
-            border: 1px solid #e6edf2;
-            border-bottom: 0;
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-            z-index: 1;
-        }
+.comment-form-title {
+    position: absolute;
+    left: 20px;
+    top: 2px;
+    display: inline-block;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
+    color: #111827;
+    font-size: 17px;
+    font-weight: 700;
+    padding: 12px 20px;
+    border: 1px solid #e6edf2;
+    border-bottom: 0;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    z-index: 1;
+}
 
-        /* Nội dung form */
-        .comment-form-content {
-            padding: 12px 18px 76px 18px; /* chừa chỗ cho nút share nổi */
-            display: grid;
-            gap: 12px;
-            position: relative;
-        }
+.comment-form-content {
+    padding: 18px 18px 20px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
 
-        /* Ghi đè CSS mặc định của WordPress */
-        .comment-respond p {
-            margin: 0 !important;
-            padding: 0 !important;
-        }
+textarea {
+    width: 100%;
+    min-height: 120px;
+    border-radius: 10px;
+    border: 1px solid #d9dee6;
+    padding: 12px 14px;
+    font-size: 15px;
+    color: #333;
+    resize: vertical;
+    transition: 0.2s;
+}
+textarea::placeholder { color: #9aa3af; }
+textarea:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13,110,253,0.18);
+    outline: none;
+}
 
-        .comment-form-comment {
-            margin: 0 !important;
-        }
+/* ===== Nút Share ===== */
+.form-submit {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+}
 
-        .comment-reply-title {
-            display: none !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
+.form-submit input[type="submit"] {
+    background: #d31d4d;
+    color: #fff;
+    border: none;
+    padding: 10px 22px;
+    font-size: 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+    text-transform: uppercase;
+}
+.form-submit input[type="submit"]:hover {
+    background-color: #b0133d;
+}
 
-        #respond {
-            padding-top: 0 !important;
-            margin-top: 0 !important;
-        }
+/* Ẩn phần mặc định */
+.comment-form p.logged-in-as,
+.comment-notes { display: none !important; }
 
-        textarea {
-            width: 100%;
-            min-height: 140px;
-            border-radius: 10px;
-            border: 1px solid #d9dee6;
-            padding: 12px 14px;
-            margin: 0;
-            font-size: 15px;
-            color: #333;
-            background-color: #fff;
-            resize: vertical;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
-            transition: box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
-        }
-        textarea::placeholder { color: #9aa3af; }
+/* ===== Danh sách bình luận ===== */
+.comment-list {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    list-style: none;
+    padding: 0;
+}
 
-        textarea:focus {
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 3px rgba(13,110,253,0.18);
-            outline: none;
-        }
+.comment-list li {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 18px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+}
 
-        /* Căn nút Share sang phải */
-        .form-submit {
-            margin: 0;
-            padding: 0;
-            height: 0;
-        }
+.comment-list .avatar {
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+}
 
-        .form-submit input[type="submit"] {
-            position: absolute;
-            right: 22px;
-            bottom: 22px;
-            background: linear-gradient(180deg, #38b6ff 0%, #0d6efd 100%);
-            color: #fff;
-            border: none;
-            padding: 12px 26px;
-            font-size: 15px;
-            border-radius: 14px;
-            cursor: pointer;
-            font-weight: 600;
-            box-shadow: 0 16px 32px rgba(13,110,253,0.35);
-            transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s;
-            text-transform: lowercase;
-        }
+.comment-body {
+    flex: 1;
+}
 
-        .form-submit input[type="submit"]:hover {
-            background-color: #1e7bf0;
-            transform: translateY(-1px);
-            box-shadow: 0 20px 36px rgba(13,110,253,0.4);
-        }
+.comment-author {
+    font-size: 18px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 4px;
+}
 
-        /* Ẩn phần mặc định của WP */
-        .comment-form p.logged-in-as,
-        .comment-notes {
-            display: none !important;
-        }
+.comment-meta {
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 10px;
+}
 
-        /* Danh sách bình luận */
-        .comment-list {
-            width: 100%;
-            max-width: 700px;
-            margin: 0 auto;
-            list-style: none;
-            padding: 0;
-        }
+.comment-content {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #333;
+    margin-bottom: 10px;
+}
 
-        .comment-list li {
-            background-color: #fff;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid #eee;
-            display: flex;
-            gap: 15px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
+.comment-reply-link {
+    display: inline-block;
+    background-color: #d31d4d;
+    color: #fff !important;
+    text-decoration: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: 0.2s;
+}
+.comment-reply-link:hover {
+    background-color: #b0133d;
+}
 
-        .comment-list .avatar {
-            border-radius: 50%;
-        }
-
-        .comment-body {
-            flex: 1;
-        }
-
-        .comment-author {
-            font-weight: bold;
-            color: #333;
-        }
-
-        .comment-meta {
-            font-size: 13px;
-            color: #777;
-            margin-bottom: 5px;
-        }
-
-        .comment-content {
-            font-size: 15px;
-            line-height: 1.5;
-            color: #444;
-        }
+/* ===== Bình luận con ===== */
+.children {
+    margin-left: 80px;
+    margin-top: 15px;
+}
 </style>
 
 <?php if ( comments_open() || pings_open() ) : ?>
@@ -206,15 +180,11 @@ if ( post_password_required() ) {
     <div class="comment-form-header"><span class="comment-form-title">Make a Post</span></div>
     <div class="comment-form-content">
         <?php
-        // Ẩn phần mặc định của WordPress
         add_filter('comment_form_defaults', function($defaults) {
             $defaults['logged_in_as'] = '';
             $defaults['comment_notes_before'] = '';
             $defaults['comment_notes_after'] = '';
             $defaults['title_reply'] = '';
-            $defaults['title_reply_before'] = '';
-            $defaults['title_reply_after'] = '';
-            $defaults['cancel_reply_link'] = '';
             return $defaults;
         }, 1000);
 
@@ -223,10 +193,10 @@ if ( post_password_required() ) {
             'title_reply_before' => '',
             'title_reply_after'  => '',
             'cancel_reply_link'  => '',
-            'label_submit'       => 'Share',
-            'comment_field'      => '<textarea id="comment" name="comment" placeholder="What are you thinking..."></textarea>',
-            'submit_field'       => '<p class="form-submit">%1$s %2$s</p>',
-            'fields'             => array(),
+            'label_submit'  => 'Share',
+            'comment_field' => '<textarea id="comment" name="comment" placeholder="What are you thinking..."></textarea>',
+            'submit_field'  => '<p class="form-submit">%1$s %2$s</p>',
+            'fields'        => array(),
         ));
         ?>
     </div>
@@ -238,13 +208,30 @@ if ( post_password_required() ) {
 <?php endif; ?>
 
 <?php if ( have_comments() ) : ?>
-    <ul class="comment-list">
-        <?php
-        wp_list_comments(array(
-            'style'       => 'ul',
-            'avatar_size' => 50,
-            'short_ping'  => true,
-        ));
-        ?>
-    </ul>
+<ul class="comment-list">
+    <?php
+    wp_list_comments(array(
+        'style'       => 'ul',
+        'avatar_size' => 60,
+        'short_ping'  => true,
+        'callback'    => function($comment, $args, $depth) {
+            ?>
+            <li <?php comment_class(); ?> id="comment-<?php comment_ID(); ?>">
+                <?php echo get_avatar($comment, 60); ?>
+                <div class="comment-body">
+                    <div class="comment-author"><?php echo get_comment_author(); ?> viết:</div>
+                    <div class="comment-meta"><?php echo get_comment_date('j Tháng m Y'); ?> lúc <?php echo get_comment_time(); ?></div>
+                    <div class="comment-content"><?php comment_text(); ?></div>
+                    <?php comment_reply_link(array_merge($args, array(
+                        'reply_text' => 'Bình luận',
+                        'depth' => $depth,
+                        'max_depth' => $args['max_depth']
+                    ))); ?>
+                </div>
+            </li>
+            <?php
+        }
+    ));
+    ?>
+</ul>
 <?php endif; ?>
