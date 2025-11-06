@@ -571,7 +571,7 @@ get_header();
     ?>
 </aside>
 
-			</div><!-- .search-results-container -->
+            </div><!-- .search-results-container -->
 			<?php
 		} else {
 			// Default layout for other pages
@@ -607,7 +607,12 @@ get_header();
 	}
 	?>
 
-	<?php get_template_part( 'template-parts/pagination' ); ?>
+    <?php
+    // Module 15: Latest posts timeline placed under the main content
+    get_template_part( 'template-parts/search-latest-posts' );
+    ?>
+
+    <?php get_template_part( 'template-parts/pagination' ); ?>
 
 </main><!-- #site-content -->
 
