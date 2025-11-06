@@ -297,52 +297,234 @@ get_header();
 				</div><!-- .search-results-list -->
 				
 				<!-- Module 14: Bình luận mới nhất - Hiển thị 1 lần duy nhất -->
-				<aside class="search-sidebar-right module-14">
-					<h3 class="sidebar-title">Bình luận mới nhất</h3>
-					<?php
-					// Lấy 3 bình luận mới nhất từ toàn bộ website
-					$recent_comments = get_comments( array(
-						'number'  => 3,
-						'status'  => 'approve',
-						'orderby' => 'comment_date',
-						'order'   => 'DESC',
-					) );
-					
-					if ( $recent_comments ) :
-					?>
-						<ul class="recent-comments-list">
-							<?php foreach ( $recent_comments as $comment ) : 
-							$comment_post_id = $comment->comment_post_ID;
-							$comment_post_url = get_permalink( $comment_post_id );
-							$comment_post_title = get_the_title( $comment_post_id );
-						?>
-							<li class="comment-item">
-								<div class="comment-author-avatar">
-									<?php echo get_avatar( $comment, 40 ); ?>
-								</div>
-								<div class="comment-content">
-									<div class="comment-author-name">
-										<?php echo esc_html( $comment->comment_author ); ?>
-									</div>
-									<div class="comment-text">
-										<?php echo wp_trim_words( $comment->comment_content, 15, '...' ); ?>
-									</div>
-									<div class="comment-meta">
-										<span class="comment-date">
-											<?php echo human_time_diff( strtotime( $comment->comment_date ), current_time( 'timestamp' ) ) . ' trước'; ?>
-										</span>
-										<span class="comment-post-title">
-											trên <a href="<?php echo esc_url( $comment_post_url ); ?>"><?php echo esc_html( $comment_post_title ); ?></a>
-										</span>
-									</div>
-								</div>
-							</li>
-						<?php endforeach; ?>
-						</ul>
-					<?php else : ?>
-						<p class="no-comments">Chưa có bình luận nào.</p>
-					<?php endif; ?>
-				</aside>
+<aside class="search-sidebar-right module-14">
+    <h3 class="sidebar-title">Bình luận mới nhất</h3>
+
+    <style>
+    /* ======= Module 14 - Bình luận mới nhất ======= */
+.recent-comments {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    font-family: "Segoe UI", Arial, sans-serif;
+    max-width: 850px;
+    margin: 0 auto;
+}
+
+.recent-comments h3,
+.sidebar-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    border-bottom: 2px solid #f2f2f2;
+    padding-bottom: 6px;
+}
+
+/* Danh sách bình luận */
+.comment-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* Bình luận cha */
+.comment {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 18px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #f2f2f2;
+}
+.comment:last-child {
+    border-bottom: none;
+}
+
+/* Avatar vuông */
+.comment-avatar img {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 0px; /* nếu muốn vuông hẳn: để 0 */
+    border: 1px solid #ddd;
+}
+
+/* Phần nội dung */
+.comment-body {
+    flex: 1;
+}
+
+.comment-header {
+    margin-bottom: 6px;
+}
+
+.comment-author {
+    font-weight: 600;
+    color: #222;
+    font-size: 15px;
+    margin-right: 8px;
+}
+
+.comment-date {
+    font-size: 13px;
+    color: #777;
+}
+
+.comment-content {
+    margin: 6px 0 8px;
+    line-height: 1.5;
+    color: #444;
+    font-size: 14px;
+}
+
+.comment-post-title {
+    font-size: 13px;
+    color: #666;
+}
+.comment-post-title a {
+    color: #c00;
+    text-decoration: none;
+}
+.comment-post-title a:hover {
+    text-decoration: underline;
+}
+/* ===== Bình luận con (trả lời) ===== */
+.children {
+    list-style: none;
+    margin: 10px 0 0 -40px;
+    padding-left: 0;
+    /* border-left: 2px solid #ececec; */
+}
+
+.children .comment {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    border: 1px solid #ececec;
+    background: #fafafa;
+    border-radius: 0px;
+    max-width: 90%;
+}
+
+.children .comment-avatar img {
+    width: 38px;
+    height: 38px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.children .comment-body {
+    flex: 1;
+    word-break: break-word;
+}
+
+.children .comment-content {
+    margin: 4px 0 6px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #444;
+}
+
+.children .comment-author {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+.children .comment-date {
+    font-size: 12px;
+    color: #888;
+}
+
+/* Hover hiệu ứng nhẹ */
+/* .comment:hover {
+    background: #fafafa;
+    transition: background 0.2s ease;
+    border-radius: 6px;
+    padding-left: 5px;
+} */
+
+    </style>
+
+    <?php
+    // Lấy 3 bình luận mới nhất toàn site (chỉ bình luận cha, có con thì hiển thị theo cây)
+    $recent_comments = get_comments([
+        'number'  => 3,
+        'status'  => 'approve',
+        'orderby' => 'comment_date_gmt',
+        'order'   => 'DESC',
+        'parent'  => 0,
+    ]);
+
+    if ( $recent_comments ) :
+        echo '<div class="recent-comments">';
+        echo '<ul class="comment-list">';
+        foreach ( $recent_comments as $comment ) :
+            $comment_post_id    = $comment->comment_post_ID;
+            $comment_post_url   = get_permalink( $comment_post_id );
+            $comment_post_title = get_the_title( $comment_post_id );
+            ?>
+            <li class="comment">
+                <div class="comment-avatar">
+                    <?php echo get_avatar( $comment, 50 ); ?>
+                </div>
+                <div class="comment-body">
+                    <div class="comment-header">
+                        <span class="comment-author"><?php echo esc_html( $comment->comment_author ); ?></span>
+                        <span class="comment-date">
+                            <?php echo human_time_diff( strtotime( $comment->comment_date ), current_time( 'timestamp' ) ); ?> trước
+                        </span>
+                    </div>
+                    <div class="comment-content"><?php echo esc_html( wp_trim_words( $comment->comment_content, 25, '...' ) ); ?></div>
+                    <div class="comment-post-title">
+                        trên bài: <a href="<?php echo esc_url( $comment_post_url ); ?>"><?php echo esc_html( $comment_post_title ); ?></a>
+                    </div>
+
+                    <?php
+                    // Hiển thị trả lời (bình luận con)
+                    $child_comments = get_comments([
+                        'parent' => $comment->comment_ID,
+                        'status' => 'approve',
+                        'orderby' => 'comment_date_gmt',
+                        'order' => 'ASC',
+                    ]);
+
+                    if ( $child_comments ) :
+                        echo '<ul class="children">';
+                        foreach ( $child_comments as $child ) : ?>
+                            <li class="comment">
+                                <div class="comment-avatar">
+                                    <?php echo get_avatar( $child, 40 ); ?>
+                                </div>
+                                <div class="comment-body">
+                                    <div class="comment-header">
+                                        <span class="comment-author"><?php echo esc_html( $child->comment_author ); ?></span>
+                                        <span class="comment-date">
+                                            <?php echo human_time_diff( strtotime( $child->comment_date ), current_time( 'timestamp' ) ); ?> trước
+                                        </span>
+                                    </div>
+                                    <div class="comment-content"><?php echo esc_html( wp_trim_words( $child->comment_content, 20, '...' ) ); ?></div>
+                                </div>
+                            </li>
+                        <?php endforeach;
+                        echo '</ul>';
+                    endif;
+                    ?>
+                </div>
+            </li>
+        <?php
+        endforeach;
+        echo '</ul></div>';
+    else :
+        echo '<p class="no-comments">Chưa có bình luận nào.</p>';
+    endif;
+    ?>
+</aside>
 
 			</div><!-- .search-results-container -->
 			<?php
