@@ -301,153 +301,205 @@ get_header();
     <h3 class="sidebar-title">Bình luận mới nhất</h3>
 
     <style>
-    /* ======= Module 14 - Bình luận mới nhất ======= */
+    /* Cleaned Module 14 CSS (based on search-comments design) */
 .recent-comments {
     background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     font-family: "Segoe UI", Arial, sans-serif;
-    max-width: 850px;
-    margin: 0 auto;
+    width: 100%;
+    margin: 0;
+    --avatar-size: 48px;
+    --reply-avatar-size: 36px;
+    --gap: 8px; /* gap between avatar and body */
+    --avatar-offset: 0px; /* tweak to move avatar horizontally if needed */
 }
 
 .recent-comments h3,
 .sidebar-title {
     font-size: 18px;
     font-weight: 600;
-    margin-bottom: 16px;
-    border-bottom: 2px solid #f2f2f2;
-    padding-bottom: 6px;
-}
-
-/* Danh sách bình luận */
-.comment-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-/* Bình luận cha */
-.comment {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    margin-bottom: 18px;
-    padding-bottom: 18px;
-    border-bottom: 1px solid #f2f2f2;
-}
-.comment:last-child {
-    border-bottom: none;
-}
-
-/* Avatar vuông */
-.comment-avatar img {
-    width: 48px;
-    height: 48px;
-    object-fit: cover;
-    border-radius: 0px; /* nếu muốn vuông hẳn: để 0 */
-    border: 1px solid #ddd;
-}
-
-/* Phần nội dung */
-.comment-body {
-    flex: 1;
-}
-
-.comment-header {
-    margin-bottom: 6px;
-}
-
-.comment-author {
-    font-weight: 600;
-    color: #222;
-    font-size: 15px;
-    margin-right: 8px;
-}
-
-.comment-date {
-    font-size: 13px;
-    color: #777;
-}
-
-.comment-content {
-    margin: 6px 0 8px;
-    line-height: 1.5;
-    color: #444;
-    font-size: 14px;
-}
-
-.comment-post-title {
-    font-size: 13px;
-    color: #666;
-}
-.comment-post-title a {
-    color: #c00;
-    text-decoration: none;
-}
-.comment-post-title a:hover {
-    text-decoration: underline;
-}
-/* ===== Bình luận con (trả lời) ===== */
-.children {
-    list-style: none;
-    margin: 10px 0 0 -40px;
-    padding-left: 0;
-    /* border-left: 2px solid #ececec; */
-}
-
-.children .comment {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
     margin-bottom: 12px;
-    padding: 10px 12px;
-    border: 1px solid #ececec;
-    background: #fafafa;
-    border-radius: 0px;
-    max-width: 90%;
+    border-bottom: 2px solid #f2f2f2;
+    padding-bottom: 8px;
+}
+/* ===== DANH SÁCH BÌNH LUẬN ===== */
+.comment-list { 
+    list-style: none;              /* Bỏ ký hiệu đầu dòng của danh sách */
+    margin: 0;                     /* Xóa khoảng cách bên ngoài */
+    padding: 0;                    /* Xóa khoảng cách bên trong */
 }
 
-.children .comment-avatar img {
-    width: 38px;
-    height: 38px;
-    object-fit: cover;
-    border-radius: 4px;
-    border: 1px solid #ddd;
+/* ===== BÌNH LUẬN GỐC ===== */
+.comment-list > .comment { 
+    display: flex;                 /* Hiển thị phần tử con theo hàng ngang */
+    align-items: flex-start;       /* Canh các phần tử con theo đầu trên */
+    gap: var(--gap);               /* Khoảng cách giữa avatar và nội dung */
+    padding: 4px 0;                /* Khoảng cách trên – dưới cho mỗi bình luận */
+    width: 100%;                   /* Chiếm toàn bộ chiều ngang */
+    box-sizing: border-box;        /* Tính padding & border trong kích thước tổng */
 }
 
-.children .comment-body {
-    flex: 1;
-    word-break: break-word;
+/* ===== ẢNH ĐẠI DIỆN NGƯỜI DÙNG ===== */
+.comment-avatar { 
+    flex: 0 0 var(--avatar-size);  /* Chiều rộng cố định theo biến avatar-size */
+    margin-left: calc(var(--avatar-offset)); /* Dịch trái theo giá trị offset */
+}
+.comment-avatar img { 
+    width: var(--avatar-size);     /* Chiều rộng ảnh theo biến avatar-size */
+    height: var(--avatar-size);    /* Chiều cao ảnh tương tự */
+    object-fit: cover;             /* Cắt ảnh vừa khung mà không méo */
+    border-radius: 4px;            /* Bo tròn nhẹ các góc ảnh */
 }
 
-.children .comment-content {
-    margin: 4px 0 6px;
-    font-size: 14px;
-    line-height: 1.5;
-    color: #444;
+/* ===== PHẦN NỘI DUNG BÌNH LUẬN ===== */
+.comment-body { 
+    flex: 1;                       /* Chiếm phần còn lại của hàng */
 }
 
-.children .comment-author {
-    font-weight: 600;
-    color: #333;
-    font-size: 14px;
+/* ===== TIÊU ĐỀ BÌNH LUẬN (chứa tên, ngày, v.v.) ===== */
+.comment-header { 
+    position: relative;            /* Dùng để đặt pseudo-element notch */
+    background: #efefef;           /* Màu nền xám nhạt */
+    border: 1px solid #d0d0d0;     /* Viền màu xám sáng */
+    border-radius: 4px 4px 0 0;    /* Bo tròn hai góc trên */
+    padding: 8px 12px;             /* Khoảng cách trong khung tiêu đề */
+    margin: 0;                     /* Xóa margin mặc định */
+    display: flex;                 /* Bố trí tên & thời gian theo hàng ngang */
+    align-items: center;           /* Căn giữa theo chiều dọc */
+    justify-content: space-between;/* Cách đều hai đầu */
+    gap: 8px;                      /* Khoảng cách giữa các phần tử trong header */
 }
 
-.children .comment-date {
-    font-size: 12px;
-    color: #888;
+/* Mũi nhọn chỉ vào avatar — lớp viền ngoài */
+.comment-header::before { 
+    content: ""; 
+    position: absolute; 
+    left: -9px;                    /* Đặt bên trái khung tiêu đề */
+    top: 50%;                      /* Giữa theo chiều dọc */
+    transform: translateY(-50%);   /* Căn chính giữa */
+    width: 0; height: 0;           /* Tạo hình tam giác bằng border */
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-right: 8px solid #d0d0d0; /* Màu viền ngoài */
 }
 
-/* Hover hiệu ứng nhẹ */
-/* .comment:hover {
-    background: #fafafa;
-    transition: background 0.2s ease;
-    border-radius: 6px;
-    padding-left: 5px;
-} */
+/* Mũi nhọn bên trong — lớp nền */
+.comment-header::after { 
+    content: ""; 
+    position: absolute; 
+    left: -8px; 
+    top: 50%; 
+    transform: translateY(-50%); 
+    width: 0; height: 0; 
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+    border-right: 7px solid #efefef; /* Cùng màu nền header */
+}
+
+/* ===== TÊN TÁC GIẢ ===== */
+.comment-author { 
+    font-weight: 700;              /* Chữ đậm */
+    font-size: 14px;               /* Cỡ chữ vừa */
+    color: #222;                   /* Màu chữ đen nhạt */
+    display: block;                /* Hiển thị dạng khối */
+    flex: 1;                       /* Chiếm tối đa phần trống còn lại */
+    min-width: 0;                  /* Cho phép co nhỏ khi text-overflow */
+    overflow: hidden;              /* Ẩn chữ tràn */
+    text-overflow: ellipsis;       /* Hiển thị “…” khi tên quá dài */
+    white-space: nowrap;           /* Không xuống dòng */
+}
+
+/* ===== NGÀY GIỜ BÌNH LUẬN ===== */
+.comment-date { 
+    display: none;                 /* Ẩn phần ngày (nếu không dùng) */
+}
+
+/* ===== NỘI DUNG CHÍNH CỦA BÌNH LUẬN ===== */
+.comment-content { 
+    background: #fff;              /* Nền trắng */
+    border: 1px solid #dcdcdc;     /* Viền xám nhạt */
+    border-radius: 0 0 4px 4px;    /* Bo tròn hai góc dưới */
+    padding: 10px 12px;            /* Khoảng cách trong nội dung */
+    font-size: 14px;               /* Cỡ chữ dễ đọc */
+    color: #6f6f6f;                /* Màu chữ xám đậm */
+    line-height: 1.6;              /* Giãn dòng thoải mái */
+    margin: 0;                     /* Xóa margin mặc định */
+    border-top: none;              /* Loại bỏ viền trên (đã có từ header) */
+}
+
+/* ===== DANH SÁCH CÁC TRẢ LỜI (REPLIES) ===== */
+.children { 
+    list-style: none;              /* Bỏ ký hiệu danh sách */
+    margin: 10px 0 0 0;            /* Tạo khoảng cách trên với bình luận gốc */
+    padding: 0;                    /* Xóa padding mặc định */
+    margin-right: calc(var(--avatar-size) + var(--gap)); /* Dịch sang phải để thụt cấp */
+	width: 92%;	;
+}
+
+/* ===== MỖI TRẢ LỜI ===== */
+.children .comment { 
+    display: flex;                 /* Cũng dùng bố cục ngang */
+    align-items: flex-start;       /* Căn trên cùng */
+    gap: var(--gap);               /* Khoảng cách giữa avatar và nội dung */
+    padding: 6px 0;                /* Khoảng cách trên – dưới */ 
+}
+
+/* ===== ẢNH ĐẠI DIỆN TRONG PHẦN TRẢ LỜI ===== */
+.children .comment-avatar img { 
+    width: var(--reply-avatar-size);  /* Kích thước nhỏ hơn avatar chính */
+    height: var(--reply-avatar-size);
+    border-radius: 3px;               /* Bo nhẹ hơn */
+}
+
+/* ===== TIÊU ĐỀ TRẢ LỜI ===== */
+.children .comment-header { 
+    padding: 6px 8px;              /* Padding nhỏ hơn header chính */
+    background: #f0f0f0;           /* Màu nền xám nhạt hơn */
+    border: 1px solid #d6d6d6;     /* Viền sáng */
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between;
+    gap: 6px;
+}
+
+/* Mũi nhọn chỉ avatar của reply – viền ngoài */
+.children .comment-header::before { 
+    content: ""; 
+    position: absolute; 
+    left: -8px; 
+    top: 50%; 
+    transform: translateY(-50%); 
+    width: 0; height: 0; 
+    border-top: 7px solid transparent; 
+    border-bottom: 7px solid transparent; 
+    border-right: 7px solid #d6d6d6; 
+}
+
+/* Mũi nhọn bên trong – cùng màu nền */
+.children .comment-header::after { 
+    content: ""; 
+    position: absolute; 
+    left: -7px; 
+    top: 50%; 
+    transform: translateY(-50%); 
+    width: 0; height: 0; 
+    border-top: 6px solid transparent; 
+    border-bottom: 6px solid transparent; 
+    border-right: 6px solid #f0f0f0; 
+}
+
+/* Ensure comment body takes full available width so single parent comments match others */
+.comment { width:100%; }
+.comment-body { width:100%; box-sizing:border-box; }
+
+/* Consistent visible card width for all comments (parents and replies)
+    Calculate the content column width once and apply to bodies so cards match */
+.recent-comments { --content-width: calc(100% - var(--avatar-size) - var(--gap)); }
+.comment-body { max-width: var(--content-width); }
+.children .comment-body { max-width: var(--content-width); }
+
+@media (max-width:600px) {
+    .comment-avatar img { width:44px; height:44px; }
+}
 
     </style>
 
@@ -471,19 +523,14 @@ get_header();
             ?>
             <li class="comment">
                 <div class="comment-avatar">
-                    <?php echo get_avatar( $comment, 50 ); ?>
+                    <?php echo get_avatar( $comment, 48 ); ?>
                 </div>
                 <div class="comment-body">
                     <div class="comment-header">
                         <span class="comment-author"><?php echo esc_html( $comment->comment_author ); ?></span>
-                        <span class="comment-date">
-                            <?php echo human_time_diff( strtotime( $comment->comment_date ), current_time( 'timestamp' ) ); ?> trước
-                        </span>
+                        
                     </div>
                     <div class="comment-content"><?php echo esc_html( wp_trim_words( $comment->comment_content, 25, '...' ) ); ?></div>
-                    <div class="comment-post-title">
-                        trên bài: <a href="<?php echo esc_url( $comment_post_url ); ?>"><?php echo esc_html( $comment_post_title ); ?></a>
-                    </div>
 
                     <?php
                     // Hiển thị trả lời (bình luận con)
@@ -504,9 +551,7 @@ get_header();
                                 <div class="comment-body">
                                     <div class="comment-header">
                                         <span class="comment-author"><?php echo esc_html( $child->comment_author ); ?></span>
-                                        <span class="comment-date">
-                                            <?php echo human_time_diff( strtotime( $child->comment_date ), current_time( 'timestamp' ) ); ?> trước
-                                        </span>
+                                      
                                     </div>
                                     <div class="comment-content"><?php echo esc_html( wp_trim_words( $child->comment_content, 20, '...' ) ); ?></div>
                                 </div>
