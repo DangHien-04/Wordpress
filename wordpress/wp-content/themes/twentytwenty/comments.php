@@ -84,7 +84,7 @@ textarea:focus {
 }
 
 .form-submit input[type="submit"] {
-    background: #d31d4d;
+    background: #007bff;
     color: #fff;
     border: none;
     padding: 10px 22px;
