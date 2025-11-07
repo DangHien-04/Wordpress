@@ -501,6 +501,20 @@ get_header();
     .comment-avatar img { width:44px; height:44px; }
 }
 
+/* Compact comments (homepage/sidebar) styling */
+.compact-recent-comments .compact-comment-list { list-style:none; margin:0; padding:0; }
+.compact-recent-comments .compact-comment-list li { border-bottom: 1px solid #ddd; }
+.compact-recent-comments .compact-comment-list li a { display:block; padding:10px 0; color:#1277d4; text-decoration:none; font-weight:700; }
+ .sidebar-title {
+        font-size: 20px;
+        color: #333;
+    }
+    .comment-line {
+        border: 0;
+        border-top: 2px solid #333; /* Adjust color and thickness */
+        width: 50%; /* Adjust width as needed */
+        margin-top: 5px; /* Add space between the title and the line */
+    }
     </style>
 
     <?php
@@ -569,25 +583,114 @@ get_header();
         echo '<p class="no-comments">Chưa có bình luận nào.</p>';
     endif;
     ?>
+
+    <!-- Compact recent comments: only comment content as links to the comment (homepage only) -->
+    <?php if ( is_front_page() || is_home() ) :
+        $compact_comments = get_comments([
+            'number'  => 5,
+            'status'  => 'approve',
+            'orderby' => 'comment_date_gmt',
+            'order'   => 'DESC',
+        ]);
+
+        if ( $compact_comments ) : ?>
+            <div class="compact-recent-comments" style="margin-top:16px;">
+                <h4 class="compact-title" style="font-size:14px;margin:0 0 8px;padding:0;color:#333;">Comments</h4>
+                <ul class="compact-comment-list" style="list-style:none;margin:0;padding:0;">
+                    <?php foreach ( $compact_comments as $c ) :
+                        $link = get_comment_link( $c );
+                        $text = wp_trim_words( wp_strip_all_tags( $c->comment_content ), 12, '...' );
+                    ?>
+                         <li style="padding:8px 0;border-bottom:1px solid #ddd;">
+                            <a href="<?php echo esc_url( $link ); ?>" style="color:#1277d4;text-decoration:none;font-size:13px;font-weight:700;">
+                                <?php echo esc_html( $text ); ?>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif;
+    endif; ?>
+
 </aside>
 
             </div><!-- .search-results-container -->
 			<?php
-		} else {
-			// Default layout for other pages
-			$i = 0;
+        } else {
+            // Default layout for other pages
+            // If this is the homepage (posts index), render a 3-column layout: Archive | Content | Comments
+            if ( is_front_page() || is_home() ) {
+                echo '<div class="home-three-column section-inner" style="display:flex;gap:24px;align-items:flex-start;">';
+                // Left: Archive (module 11)
+                echo '<aside class="home-left" style="flex:0 0 200px;">';
+                echo '<h3 class="sidebar-title">Archive</h3>';
+                echo '<ul style="list-style:none;padding:0;margin:0 0 16px;">';
+                wp_get_archives( array( 'type' => 'monthly', 'limit' => 6, 'format' => 'html' ) );
+                echo '</ul>';
+                echo '</aside>';
 
-			while ( have_posts() ) {
-				++$i;
-				if ( $i > 1 ) {
-					echo '<hr class="post-separator styled-separator is-style-wide section-inner" aria-hidden="true" />';
-				}
-				the_post();
+                // Center: main posts loop
+                echo '<div class="home-center" style="flex:1;">';
+                $i = 0;
+                while ( have_posts() ) {
+                    ++$i;
+                    if ( $i > 1 ) {
+                        echo '<hr class="post-separator styled-separator is-style-wide section-inner" aria-hidden="true" />';
+                    }
+                    the_post();
+                    get_template_part( 'template-parts/content', get_post_type() );
+                }
+                echo '</div>'; // .home-center
 
-				get_template_part( 'template-parts/content', get_post_type() );
+                // Right: Compact Comments (module 12)
+                echo '<aside class="home-right" style="flex:0 0 240px;">';
+echo '<h3 class="sidebar-title" style="
+    display: inline-block;
+    position: relative;
+    margin-bottom: 15px;
+">
+    Comment
+    <span style="
+        content: \'\';
+        position: absolute;
+        left: 0;
+        bottom: -3px;
+        width: 70%;
+        height: 2px;
+        background-color: #333;
+    "></span>
+</h3>';
+                $compact_comments = get_comments([
+                    'number'  => 3,
+                    'status'  => 'approve',
+                    'orderby' => 'comment_date_gmt',
+                    'order'   => 'DESC',
+                ]);
+                if ( $compact_comments ) {
+                    echo '<ul style="list-style:none;padding:0;margin:0;">';
+                    foreach ( $compact_comments as $c ) {
+                        $link = get_comment_link( $c );
+                        $text = wp_trim_words( wp_strip_all_tags( $c->comment_content ), 12, '...' );
+                       echo '<li style="padding:8px 0;border-bottom:1px solid #ddd;"><a href="' . esc_url( $link ) . '" style="color:#1277d4;text-decoration:none;font-size:13px;font-weight:700;">' . esc_html( $text ) . '</a></li>'; 
+                    }
+                    echo '</ul>';
+                }
+                echo '</aside>';
 
-			}
-		}
+                echo '</div>'; // .home-three-column
+            } else {
+                // Other pages keep the original single-column loop
+                $i = 0;
+                while ( have_posts() ) {
+                    ++$i;
+                    if ( $i > 1 ) {
+                        echo '<hr class="post-separator styled-separator is-style-wide section-inner" aria-hidden="true" />';
+                    }
+                    the_post();
+                    get_template_part( 'template-parts/content', get_post_type() );
+                }
+            }
+        }
 	} elseif ( is_search() ) {
 		?>
 
