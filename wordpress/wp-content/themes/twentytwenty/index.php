@@ -609,7 +609,10 @@ get_header();
 
     <?php
     // Module 15: Latest posts timeline placed under the main content
-    get_template_part( 'template-parts/search-latest-posts' );
+    // Show only on search results pages
+    if ( is_search() ) {
+        get_template_part( 'template-parts/search-latest-posts' );
+    }
     ?>
 
     <?php get_template_part( 'template-parts/pagination' ); ?>
